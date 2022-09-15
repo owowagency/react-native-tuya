@@ -29,6 +29,7 @@ import com.tuya.smart.sdk.api.*
 import com.tuya.smart.sdk.bean.DeviceBean
 import com.tuya.smart.sdk.bean.MultiModeActivatorBean
 import com.tuya.smart.sdk.enums.ActivatorModelEnum
+import android.util.Log
 
 
 class TuyaActivatorModule(reactContext: ReactApplicationContext) :
@@ -152,6 +153,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
           }
 
           override fun onFailure(code: Int, msg: String?, handle: Any?) {
+            Log.e("TuyaActivatorModule", code.toString(), msg.toString());
             promise.reject(code.toString(), msg);
           }
         });
