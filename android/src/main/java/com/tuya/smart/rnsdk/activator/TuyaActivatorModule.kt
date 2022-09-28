@@ -32,12 +32,13 @@ import com.tuya.smart.sdk.enums.ActivatorModelEnum
 import android.util.Log
 
 
-class TuyaActivatorModule(reactContext: ReactApplicationContext) :
+abstract class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
   var mITuyaActivator: ITuyaActivator? = null
   var mTuyaGWActivator: ITuyaActivator? = null
   var mTuyaCameraActivator: ITuyaCameraDevActivator? = null
+  var leActivatorUUID: String? = null
 
   override fun getName(): String {
     return "TuyaActivatorModule"
@@ -126,7 +127,8 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
           UUID,
           ADDRESS,
           MAC,
-          DEVICE_TYPE
+          DEVICE_TYPE,
+          TIMEOUT
         ), params
       )
     ) {
@@ -143,9 +145,10 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
 
       multiModeActivatorBean.homeId = params.getDouble(HOMEID).toLong();
       multiModeActivatorBean.token = params.getString(TOKEN);
-      multiModeActivatorBean.timeout = 180000;
+      multiModeActivatorBean.timeout = params.getInt(TIMEOUT).toLong();
       multiModeActivatorBean.phase1Timeout = 60000;
 
+      leActivatorUUID = params.getString(UUID);
       TuyaHomeSdk.getActivator().newMultiModeActivator()
         .startActivator(multiModeActivatorBean, object : IMultiModeActivatorListener {
           override fun onSuccess(bean: DeviceBean) {
@@ -153,10 +156,17 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
           }
 
           override fun onFailure(code: Int, msg: String?, handle: Any?) {
-            Log.e("TuyaActivatorModule", code.toString(), msg.toString());
+            Log.e("TuyaActivatorModule", code.toString() + msg.toString());
             promise.reject(code.toString(), msg);
           }
         });
+    }
+  }
+
+  @ReactMethod
+  fun stopLeActivation() {
+    if (leActivatorUUID != null) {
+      TuyaHomeSdk.getBleManager().stopBleConfig(leActivatorUUID)
     }
   }
 

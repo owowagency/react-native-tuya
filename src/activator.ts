@@ -98,6 +98,22 @@ export function initBluetoothDualModeActivatorFromScanBean(
   return tuya.initBluetoothDualModeActivatorFromScanBean(params);
 }
 
+export function stopLeScan() {
+  if (Platform.OS === 'ios') {
+    // TODO
+    return;
+  }
+  return tuya.stopBluetoothScan();
+}
+
+export function stopLePairing() {
+  if (Platform.OS === 'ios') {
+    // TODO
+    return;
+  }
+  return tuya.stopLeActivation();
+}
+
 export function getCurrentWifi(
   success: (ssid: string) => void,
   error: () => void
