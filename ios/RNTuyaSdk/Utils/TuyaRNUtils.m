@@ -14,7 +14,12 @@
 + (void)rejecterWithError:(NSError *)error
                   handler:(RCTPromiseRejectBlock)rejecter {
   if (rejecter) {
-    rejecter([NSString stringWithFormat:@"%ld", error.code], error.userInfo[NSLocalizedDescriptionKey], error);
+    NSString* code = [NSString stringWithFormat:@"%ld", error.code];
+    // Tuya SDK puts error codes in "localizedFailureReason", equivalent to the first argument in the error callback in the Android SDK
+    if (error.localizedFailureReason) {
+        code = error.localizedFailureReason;
+    }
+    rejecter(code, error.userInfo[NSLocalizedDescriptionKey], error);
   }
 }
 
