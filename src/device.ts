@@ -56,9 +56,10 @@ export type DeviceDps = {
 };
 export type SendParams = {
   devId: string;
-} & DeviceDps;
+  command: DeviceDps
+};
 
-export function send(params: object) {
+export function send(params: SendParams): Promise<string> {
   return tuya.send(params);
 }
 
