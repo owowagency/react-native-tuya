@@ -25,6 +25,39 @@ export function startOta(
   });
 }
 
-export function getOtaInfo(params: StartOtaParams): Promise<any[]> {
+export enum TuyaUpgradeStatus {
+  noUpdate,
+  updateAvailable,
+  updating,
+  waitForDevice = 5,
+}
+export type ThingSmartFirmwareUpgradeModel = {
+  timeout: number;
+  controlType: boolean;
+  currentVersion: string;
+  devType: number;
+  upgradedType: number;
+  canUpgrade: boolean;
+  autoSwitch: boolean;
+  typeDesc: string;
+  type: number;
+  upgradeStatus: TuyaUpgradeStatus;
+  diffOta: false;
+  url?: string;
+  lastUpgradeTime: number;
+  firmwareDeployTime: number;
+  upgradeMode?: number;
+  desc?: string;
+  md5?: string;
+  upgradingDesc?: string;
+  fileSize: string;
+  version: string;
+};
+
+export function getOtaInfo(params: { devId: string }): Promise<ThingSmartFirmwareUpgradeModel[]> {
   return tuya.getOtaInfo(params);
+}
+
+export function startFirmwareUpgrade(params: { devId: string; firmwares: ThingSmartFirmwareUpgradeModel[] }): Promise<boolean> {
+  return tuya.startFirmwareUpgrade(params);
 }

@@ -40,7 +40,8 @@ export type DevListenerType =
   | 'onDevInfoUpdate'
   | 'onFirmwareUpgradeSuccess'
   | 'onFirmwareUpgradeFailure'
-  | 'onFirmwareUpgradeProgress';
+  | 'onFirmwareUpgradeProgress'
+  | 'onFirmwareUpgradeStatus';
 
 let devListenerSubs: { [devId: string]: EmitterSubscription } = {};
 

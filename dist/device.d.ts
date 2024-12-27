@@ -25,7 +25,7 @@ export declare type DeviceBean = {
 export declare type DevListenerParams = {
     devId: string;
 };
-export declare type DevListenerType = 'onDpUpdate' | 'onRemoved' | 'onStatusChanged' | 'onNetworkStatusChanged' | 'onDevInfoUpdate' | 'onFirmwareUpgradeSuccess' | 'onFirmwareUpgradeFailure' | 'onFirmwareUpgradeProgress';
+export declare type DevListenerType = 'onDpUpdate' | 'onRemoved' | 'onStatusChanged' | 'onNetworkStatusChanged' | 'onDevInfoUpdate' | 'onFirmwareUpgradeSuccess' | 'onFirmwareUpgradeFailure' | 'onFirmwareUpgradeProgress' | 'onFirmwareUpgradeStatus';
 export declare function registerDevListener(params: DevListenerParams, type: DevListenerType, callback: (data: any) => void): void;
 export declare function unRegisterAllDevListeners(): void;
 export declare type DeviceDpValue = boolean | number | string;

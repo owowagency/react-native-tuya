@@ -186,6 +186,27 @@ static inline BOOL TuyaRNDeviceListenTypeAvailable(TuyaRNDeviceListenType type) 
 
 }
 
+- (void)device:(ThingSmartDevice *)device otaUpdateStatusChanged:(ThingSmartFirmwareUpgradeStatusModel *)statusModel {
+  NSString *deviceId = device.deviceModel.devId;
+  if (!([deviceId isKindOfClass:[NSString class]] && deviceId.length > 0)) {
+    return;
+  }
+
+  NSInteger listenType = [[TuyaRNDeviceListener shareInstance].listenTypeDic[deviceId] integerValue];
+  if (listenType & TuyaRNDeviceListenType_DeviceInfo) {
+    NSDictionary *statusModelDict = [self dictionaryFromStatusModel:statusModel];
+    if (!statusModelDict) {
+      return;
+    }
+    NSDictionary *dic = @{
+                          @"devId": deviceId,
+                          @"type": @"onFirmwareUpgradeStatus"
+                          @"payload": statusModelDict
+                          };
+    [TuyaRNEventEmitter ty_sendEvent:[kTYEventEmitterDeviceInfoEvent stringByAppendingFormat:@"//%@", deviceId] withBody:dic];
+  }
+}
+
 /// 固件升级成功
 - (void)deviceFirmwareUpgradeSuccess:(ThingSmartDevice *)device type:(NSInteger)type {
   NSString *deviceId = device.deviceModel.devId;
@@ -260,6 +281,34 @@ static inline BOOL TuyaRNDeviceListenTypeAvailable(TuyaRNDeviceListenType type) 
                           };
     [TuyaRNEventEmitter ty_sendEvent:[kTYEventEmitterDeviceInfoEvent stringByAppendingFormat:@"//%@", deviceId] withBody:dic];
   }
+}
+
+- (NSDictionary *)dictionaryFromStatusModel:(ThingSmartFirmwareUpgradeStatusModel *)statusModel {
+  if (![statusModel isKindOfClass:[ThingSmartFirmwareUpgradeStatusModel class]]) {
+    return nil;
+  }
+
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+  // Add all fields from statusModel to the dictionary
+  dict[@"upgradeStatus"] = @(statusModel.upgradeStatus); // Assuming this is an enum or integer
+  dict[@"statusText"] = statusModel.statusText ?: @"";
+  dict[@"statusTitle"] = statusModel.statusTitle ?: @"";
+  dict[@"progress"] = statusModel.progress >= 0 ? @(statusModel.progress) : @(0); // Ignore values < 0
+  dict[@"type"] = @(statusModel.type);
+  dict[@"upgradeMode"] = @(statusModel.upgradeMode); // Assuming this is an enum or integer
+
+  // Handle NSError
+  if (statusModel.error) {
+    dict[@"error"] = @{
+      @"code": @(statusModel.error.code),
+      @"description": statusModel.error.localizedDescription ?: @""
+    };
+  } else {
+    dict[@"error"] = [NSNull null]; // No error
+  }
+
+  return [dict copy];
 }
 
 @end

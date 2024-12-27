@@ -190,6 +190,17 @@ RCT_EXPORT_METHOD(getOtaInfo:(NSDictionary *)params resolver:(RCTPromiseResolveB
 
 }
 
+RCT_EXPORT_METHOD(startFirmwareUpgrade:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+    ThingSmartDevice *device = [ThingSmartDevice deviceWithDeviceId:params[@"devId"]];
+    [device startFirmwareUpgrade:[params[@"firmwares"] NSDictionary] success:^{
+        if (resolver) {
+          resolver(YES);
+        }
+    } failure:^(NSError *error) {
+        [TuyaRNUtils rejecterWithError:error handler:rejecter];
+    }];
+}
+
 
 #pragma mark -
 - (ThingSmartDevice *)smartDeviceWithParams:(NSDictionary *)params {
