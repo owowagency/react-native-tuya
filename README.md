@@ -22,7 +22,7 @@ This library contains native code which is automatically linked in React Native 
 
 ## Installation
 
-In the Tuya development environment create a new app and make sure you have an "App key", "App secret" [Read how to do this](https://tuyainc.github.io/tuyasmart_home_ios_sdk_doc/en/resource/Preparation.html).
+In the Tuya development environment create a new app and make sure you have an "App key", "App secret" [Read how to do this](https://developer.tuya.com/en/docs/app-development/preparation?id=Ka69nt983bhh5).
 
 ### iOS
 
