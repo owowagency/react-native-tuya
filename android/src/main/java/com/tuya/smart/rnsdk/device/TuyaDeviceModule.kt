@@ -1,51 +1,47 @@
 package com.tuya.smart.rnsdk.device
 
-import android.util.Log
 import com.alibaba.fastjson.JSONObject
 import com.facebook.react.bridge.*
-import com.thingclips.smart.android.device.api.IGetDataPointStatCallback
-import com.thingclips.smart.android.device.bean.DataPointStatBean
-import com.thingclips.smart.android.device.enums.DataPointTypeEnum
+import com.facebook.react.module.annotations.ReactModule
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.sdk.api.IDevListener
 import com.thingclips.smart.sdk.api.IThingDevice
+import com.tuya.smart.rnsdk.NativeTuyaDeviceModuleSpec
 import com.tuya.smart.rnsdk.utils.BridgeUtils
 import com.tuya.smart.rnsdk.utils.Constant.COMMAND
-import com.tuya.smart.rnsdk.utils.Constant.DATAPOINTTYPEENUM
 import com.tuya.smart.rnsdk.utils.Constant.DEVID
-import com.tuya.smart.rnsdk.utils.Constant.DPID
 import com.tuya.smart.rnsdk.utils.Constant.NAME
+import com.tuya.smart.rnsdk.utils.Constant.DATAPOINTTYPEENUM
 import com.tuya.smart.rnsdk.utils.Constant.NUMBER
+import com.tuya.smart.rnsdk.utils.Constant.DPID
 import com.tuya.smart.rnsdk.utils.Constant.STARTTIME
 import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
 import com.tuya.smart.rnsdk.utils.ReactParamsCheck
 import com.tuya.smart.rnsdk.utils.TuyaReactUtils
+import com.thingclips.smart.android.device.api.IGetDataPointStatCallback
+import com.thingclips.smart.android.device.bean.DataPointStatBean
+import com.thingclips.smart.android.device.enums.DataPointTypeEnum
 
+@ReactModule(name = TuyaDeviceModule.NAME)
+class TuyaDeviceModule(reactContext: ReactApplicationContext) : NativeTuyaDeviceModuleSpec(reactContext) {
 
-class TuyaDeviceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+    companion object {
+        const val NAME = "TuyaDeviceModule"
+    }
 
     var device: IThingDevice? = null
 
     override fun getName(): String {
-        return "TuyaDeviceModule"
+        return NAME
     }
 
-    @ReactMethod
-    fun getDevice(params: ReadableMap, promise: Promise) {
+    override fun getDevice(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             promise.resolve(TuyaReactUtils.parseToWritableMap(getDevice(params.getString(DEVID) as String)))
         }
     }
 
-    @ReactMethod
-    fun getDeviceData(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
-            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getDeviceBean(params.getString(DEVID))))
-        }
-    }
-
-    @ReactMethod
-    fun registerDevListener(params: ReadableMap) {
+    override fun registerDevListener(params: ReadableMap) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             device = getDevice(params.getString(DEVID) as String)
             device?.registerDevListener(object : IDevListener {
@@ -97,8 +93,7 @@ class TuyaDeviceModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun unRegisterDevListener(params: ReadableMap) {
+    override fun unRegisterDevListener(params: ReadableMap) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             if (device != null) {
                 device!!.unRegisterDevListener()
@@ -106,42 +101,20 @@ class TuyaDeviceModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun onDestroy(params: ReadableMap) {
-        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
-            getDevice(params.getString(DEVID) as String)?.onDestroy()
-        }
-    }
-
-
-    @ReactMethod
-    fun send(params: ReadableMap, promise: Promise) {
+    override fun send(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID, COMMAND), params)) {
             getDevice(params.getString(DEVID) as String)?.publishDps(JSONObject.toJSONString(TuyaReactUtils.parseToMap(params.getMap(COMMAND) as ReadableMap))
                     , getIResultCallback(promise))
         }
     }
 
-
-    @ReactMethod
-    fun getDp(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(DEVID, DPID), params)) {
-            promise.resolve(getDevice(params.getString(DEVID) as String)?.getDp(
-                    params.getString(DPID),
-                    getIResultCallback(promise)
-            ))
-        }
-    }
-
-    @ReactMethod
-    fun renameDevice(params: ReadableMap, promise: Promise) {
+    override fun renameDevice(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID, NAME), params)) {
             getDevice(params.getString(DEVID) as String)?.renameDevice(params.getString(NAME), getIResultCallback(promise))
         }
     }
 
-    @ReactMethod
-    fun getDataPointStat(params: ReadableMap, promise: Promise) {
+    override fun getDataPointStat(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID, DATAPOINTTYPEENUM, NUMBER, DPID, STARTTIME), params)) {
             getDevice(params.getString(DEVID) as String)?.getDataPointStat(DataPointTypeEnum.valueOf(params.getString(DATAPOINTTYPEENUM) as String),
                     params.getDouble(STARTTIME).toLong(),
@@ -152,11 +125,22 @@ class TuyaDeviceModule(reactContext: ReactApplicationContext) : ReactContextBase
         }
     }
 
-    @ReactMethod
-    fun removeDevice(params: ReadableMap, promise: Promise) {
+    override fun removeDevice(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             getDevice(params.getString(DEVID) as String)?.removeDevice(getIResultCallback(promise))
         }
+    }
+
+    // Pre-existing bug: the real implementation lives in a separate,
+    // differently-named native module (TuyaOTAModule) that JS never
+    // actually calls. Stubbed here so this at least fails cleanly instead
+    // of throwing "tuya.getOtaInfo is not a function".
+    override fun getOtaInfo(params: ReadableMap, promise: Promise) {
+        promise.reject("TuyaDeviceModule.getOtaInfo", "getOtaInfo is not implemented on Android (see TuyaOTAModule)")
+    }
+
+    override fun startOta(params: ReadableMap) {
+        // See getOtaInfo above - not implemented on Android today.
     }
 
     fun getIGetDataPointStatCallback(promise: Promise): IGetDataPointStatCallback {
