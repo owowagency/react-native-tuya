@@ -20,14 +20,6 @@
 
 RCT_EXPORT_MODULE(TuyaTimerModule)
 
-RCT_EXPORT_METHOD(initWithOptions:(NSDictionary *)params) {
-
-}
-
-RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
-
-}
-
 // 增加定时器,带有自己定义dp点：
 RCT_EXPORT_METHOD(addTimerWithTask:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
   ThingSmartTimer *timer = [[ThingSmartTimer alloc] init];
@@ -57,19 +49,6 @@ RCT_EXPORT_METHOD(getTimerTaskStatusWithDeviceId:(NSDictionary *)params resolver
 
       if (resolver) {
         resolver(res);
-      }
-    } failure:^(NSError *error) {
-      [TuyaRNUtils rejecterWithError:error handler:rejecter];
-    }];
-}
-
-// 控制定时任务中所有定时器的开关状态：
-RCT_EXPORT_METHOD(updateTimerTaskStatusWithTask:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-    ThingSmartTimer *timer = [[ThingSmartTimer alloc] init];
-    self.timer = timer;
-    [timer updateTimerTaskStatusWithTask:params[@"taskName"] bizId:params[@"devId"] bizType:0 updateType:[params[@"status"] integerValue] success:^{
-      if (resolver) {
-        resolver(@"success");
       }
     } failure:^(NSError *error) {
       [TuyaRNUtils rejecterWithError:error handler:rejecter];
@@ -120,28 +99,6 @@ RCT_EXPORT_METHOD(updateTimerWithTask:(NSDictionary *)params resolver:(RCTPromis
     }];
 }
 
-// 获取定时任务下所有定时器：
-RCT_EXPORT_METHOD(getTimerWithTask:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-    ThingSmartTimer *timer = [[ThingSmartTimer alloc] init];
-    self.timer = timer;
-
-    [timer getTimerListWithTask:params[@"taskName"] bizId:params[@"devId"] bizType:0 success:^(NSArray<ThingTimerTaskModel *> *list) {
-
-        NSMutableArray *res = [NSMutableArray array];
-        for (ThingTimerModel *item in list) {
-          NSDictionary *dic = [item yy_modelToJSONObject];
-          [res addObject:dic];
-        }
-
-        if (resolver) {
-          resolver(res);
-        }
-    } failure:^(NSError *error) {
-      [TuyaRNUtils rejecterWithError:error handler:rejecter];
-    }];
-}
-
-
 // 获取设备所有定时任务下所有定时器：
 RCT_EXPORT_METHOD(getAllTimerWithDeviceId:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
      ThingSmartTimer *timer = [[ThingSmartTimer alloc] init];
@@ -178,5 +135,14 @@ RCT_EXPORT_METHOD(getAllTimerWithDeviceId:(NSDictionary *)params resolver:(RCTPr
       [TuyaRNUtils rejecterWithError:error handler:rejecter];
     }];
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaTimerModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

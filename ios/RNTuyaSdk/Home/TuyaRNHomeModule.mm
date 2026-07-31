@@ -11,13 +11,9 @@
 #import "TuyaRNUtils.h"
 #import <ThingSmartDeviceKit/ThingSmartHome.h>
 #import <ThingSmartDeviceKit/ThingSmartHomeModel.h>
-#import <ThingSmartDeviceKit/ThingSmartShareDeviceModel.h>
-#import <ThingSmartDeviceKit/ThingSmartGroup+DpCode.h>
-#import <ThingSmartBaseKit/ThingSmartRequest.h>
 #import <ThingSmartDeviceKit/ThingSmartRoomModel.h>
 #import "TuyaRNUtils+Cache.h"
 #import "TuyaRNUtils+DeviceParser.h"
-#import "TuyaRNHomeListener.h"
 
 #define kTuyaRNHomeModuleHomeId @"homeId"
 #define kTuyaRNHomeModuleName @"name"
@@ -58,14 +54,6 @@ RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolver:(RCTPromiseResol
   }];
 }
 
-
-RCT_EXPORT_METHOD(getHomeLocalCache:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  self.currentHome = [self smartHomeWithParams:params];
-  if(resolver) {
-    resolver([self.currentHome yy_modelToJSONObject]);
-  }
-}
-
 /**
  * 更新家庭信息
  *
@@ -94,7 +82,6 @@ RCT_EXPORT_METHOD(updateHome:(NSDictionary *)params resolver:(RCTPromiseResolveB
                        }];
 }
 
-
 /**
  * 解散家庭
  *
@@ -108,42 +95,6 @@ RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolver:(RCTPromiseResolve
   } failure:^(NSError *error) {
     [TuyaRNUtils rejecterWithError:error handler:rejecter];
   }];
-}
-
-/**
- * 添加房间
- *
- * @param name
- * @param callback
- */
-RCT_EXPORT_METHOD(addRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-  self.currentHome = [self smartHomeWithParams:params];
-  NSString *name = params[kTuyaRNHomeModuleName];
-  [self.currentHome addHomeRoomWithName:name success:^{
-    [TuyaRNUtils resolverWithHandler:resolver];
-  } failure:^(NSError *error) {
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-  }];
-}
-
-/**
- * 移除房间
- *
- * @param roomId
- * @param callback
- */
-RCT_EXPORT_METHOD(removeRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-  self.currentHome = [self smartHomeWithParams:params];
-  NSNumber *roomId = params[kTuyaRNHomeModuleRoomId];
-
-  [self.currentHome removeHomeRoomWithRoomId:roomId.longLongValue success:^{
-    [TuyaRNUtils resolverWithHandler:resolver];
-  } failure:^(NSError *error) {
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-  }];
-
 }
 
 /**
@@ -199,38 +150,6 @@ RCT_EXPORT_METHOD(queryRoomList:(NSDictionary *)params resolver:(RCTPromiseResol
   }];
 }
 
-/**
- 注册 Home信息监听
-
- */
-RCT_EXPORT_METHOD(registerHomeStatusListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-  NSNumber *homeIdNum = params[kTuyaRNHomeModuleHomeId];
-  if (!homeIdNum || homeIdNum.longLongValue <= 0) {
-    return;
-  }
-  [[TuyaRNHomeListener shareInstance] registerHomeStatusWithSmartHome:[ThingSmartHome homeWithHomeId:homeIdNum.longLongValue]];
-}
-
-/**
- 取消Home注册监听
-
- */
-RCT_EXPORT_METHOD(unRegisterHomeStatusListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  [[TuyaRNHomeListener shareInstance] removeHomeStatusSmartHome];
-}
-
-
-//
-RCT_EXPORT_METHOD(queryDeviceListToAddGroup:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-
-}
-
-RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-}
-
 #pragma mark -
 - (ThingSmartHome *)smartHomeWithParams:(NSDictionary *)params {
   long long homeId = ((NSNumber *)params[kTuyaRNHomeModuleHomeId]).longLongValue;
@@ -240,5 +159,14 @@ RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params resolver:(RCTPromiseResolveBl
   self.currentHome = [ThingSmartHome homeWithHomeId:homeId];
   return self.currentHome;
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaHomeModuleSpecJSI>(params);
+}
+
+#endif
 
 @end
