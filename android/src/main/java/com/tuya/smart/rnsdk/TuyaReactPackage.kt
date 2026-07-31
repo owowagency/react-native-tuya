@@ -19,10 +19,10 @@ import com.tuya.smart.rnsdk.user.TuyaUserModule
 
 import java.util.*
 
+// All 12 JS-reachable native modules have been converted to TurboModules.
+// See specs/*.ts for the Codegen source of truth.
 class TuyaReactPackage : TurboReactPackage() {
 
-    // Modules converted to TurboModules. As more modules are converted, move
-    // their construction here and add a matching entry to MODULE_NAMES below.
     override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? {
         return when (name) {
             TuyaCoreModule.NAME -> TuyaCoreModule(reactContext)
@@ -34,6 +34,7 @@ class TuyaReactPackage : TurboReactPackage() {
             TuyaHomeModule.NAME -> TuyaHomeModule(reactContext)
             TuyaActivatorModule.NAME -> TuyaActivatorModule(reactContext)
             TuyaDeviceModule.NAME -> TuyaDeviceModule(reactContext)
+            TuyaUserModule.NAME -> TuyaUserModule(reactContext)
             else -> null
         }
     }
@@ -56,13 +57,8 @@ class TuyaReactPackage : TurboReactPackage() {
         }
     }
 
-    // Not yet converted to TurboModules. RN 0.73's interop layer covers these
-    // under New Architecture; each will move to getModule()/MODULE_NAMES above
-    // as it's converted.
     override fun createNativeModules(reactContext: ReactApplicationContext): MutableList<NativeModule> {
-        val module: ArrayList<NativeModule> = ArrayList()
-        module.add(TuyaUserModule(reactContext))
-        return module
+        return ArrayList()
     }
 
     override fun createViewManagers(reactContext: ReactApplicationContext) = emptyList<Nothing>()
@@ -77,7 +73,8 @@ class TuyaReactPackage : TurboReactPackage() {
             TuyaTimerModule.NAME to TuyaTimerModule::class.java,
             TuyaHomeModule.NAME to TuyaHomeModule::class.java,
             TuyaActivatorModule.NAME to TuyaActivatorModule::class.java,
-            TuyaDeviceModule.NAME to TuyaDeviceModule::class.java
+            TuyaDeviceModule.NAME to TuyaDeviceModule::class.java,
+            TuyaUserModule.NAME to TuyaUserModule::class.java
         )
     }
 }
