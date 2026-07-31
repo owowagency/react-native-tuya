@@ -9,6 +9,7 @@
 #import "TuyaRNHomeMemberModule.h"
 #import "TuyaRNUtils.h"
 #import "YYModel.h"
+#import <ThingSmartUtil/ThingSmartUtil.h>
 #import <ThingSmartDeviceKit/ThingSmartHomeMember.h>
 #import <ThingSmartDeviceKit/ThingSmartHome.h>
 
@@ -84,29 +85,6 @@ RCT_EXPORT_METHOD(removeMember:(NSDictionary *)params resolver:(RCTPromiseResolv
 }
 
 /**
- * 更新成员备注名和权限
- * @param name 备注名 如果不更改备注名，传入从memberBean获取的nickName
- * @param admin  是否是管理员
- * @param callback
- */
-RCT_EXPORT_METHOD(updateMember:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-  NSNumber *memberId = params[kTuyaRNHomeMemberModuleMemberId];
-  NSString *admin = params[kTuyaRNHomeMemberModuleAdmin];
-
-  ThingSmartHomeMemberRequestModel *requestModel = [[ThingSmartHomeMemberRequestModel alloc] init];
-  requestModel.memberId = memberId.longLongValue;
-  requestModel.name = params[kTuyaRNHomeMemberModuleName];
-  requestModel.role = admin.boolValue ? ThingHomeRoleType_Admin : ThingHomeRoleType_Member;
-
-  [self.homeMember updateHomeMemberInfoWithMemberRequestModel:requestModel success:^{
-    [TuyaRNUtils resolverWithHandler:resolver];
-  } failure:^(NSError *error) {
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-  }];
-}
-
-/**
  * 查询Home下面的成员列表
  *
  */
@@ -149,5 +127,14 @@ RCT_EXPORT_METHOD(queryMemberList:(NSDictionary *)params resolver:(RCTPromiseRes
   }
   return _homeMember;
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaHomeMemberModuleSpecJSI>(params);
+}
+
+#endif
 
 @end
