@@ -32,6 +32,7 @@ class TuyaReactPackage : TurboReactPackage() {
             TuyaHomeDataManagerModule.NAME -> TuyaHomeDataManagerModule(reactContext)
             TuyaTimerModule.NAME -> TuyaTimerModule(reactContext)
             TuyaHomeModule.NAME -> TuyaHomeModule(reactContext)
+            TuyaActivatorModule.NAME -> TuyaActivatorModule(reactContext)
             else -> null
         }
     }
@@ -59,7 +60,6 @@ class TuyaReactPackage : TurboReactPackage() {
     // as it's converted.
     override fun createNativeModules(reactContext: ReactApplicationContext): MutableList<NativeModule> {
         val module: ArrayList<NativeModule> = ArrayList()
-        module.add(TuyaActivatorModule(reactContext))
         module.add(TuyaDeviceModule(reactContext))
         module.add(TuyaUserModule(reactContext))
         return module
@@ -75,7 +75,8 @@ class TuyaReactPackage : TurboReactPackage() {
             TuyaHomeMemberModule.NAME to TuyaHomeMemberModule::class.java,
             TuyaHomeDataManagerModule.NAME to TuyaHomeDataManagerModule::class.java,
             TuyaTimerModule.NAME to TuyaTimerModule::class.java,
-            TuyaHomeModule.NAME to TuyaHomeModule::class.java
+            TuyaHomeModule.NAME to TuyaHomeModule::class.java,
+            TuyaActivatorModule.NAME to TuyaActivatorModule::class.java
         )
     }
 }

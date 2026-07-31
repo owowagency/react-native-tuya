@@ -3,11 +3,11 @@ package com.tuya.smart.rnsdk.activator
 import android.content.Intent
 import android.provider.Settings
 import com.facebook.react.bridge.*
+import com.facebook.react.module.annotations.ReactModule
 import com.thingclips.smart.android.ble.api.ScanType
 import com.thingclips.smart.android.common.utils.WiFiUtil
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.builder.ActivatorBuilder
-import com.thingclips.smart.home.sdk.builder.ThingGwSubDevActivatorBuilder
 import com.thingclips.smart.sdk.api.IMultiModeActivatorListener
 import com.thingclips.smart.sdk.api.IThingActivator
 import com.thingclips.smart.sdk.api.IThingActivatorGetToken
@@ -15,37 +15,34 @@ import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
 import com.thingclips.smart.sdk.bean.DeviceBean
 import com.thingclips.smart.sdk.bean.MultiModeActivatorBean
 import com.thingclips.smart.sdk.enums.ActivatorModelEnum
+import com.tuya.smart.rnsdk.NativeTuyaActivatorModuleSpec
 import com.tuya.smart.rnsdk.utils.*
 import com.tuya.smart.rnsdk.utils.Constant.HOMEID
 import com.tuya.smart.rnsdk.utils.Constant.PASSWORD
 import com.tuya.smart.rnsdk.utils.Constant.SSID
 import com.tuya.smart.rnsdk.utils.Constant.TIME
-import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.TYPE
 
+@ReactModule(name = TuyaActivatorModule.NAME)
+class TuyaActivatorModule(reactContext: ReactApplicationContext) : NativeTuyaActivatorModuleSpec(reactContext) {
 
-class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+  companion object {
+    const val NAME = "TuyaActivatorModule"
+  }
 
   var mITuyaActivator: IThingActivator? = null
   var mTuyaGWActivator: IThingActivator? = null
+
   override fun getName(): String {
-    return "TuyaActivatorModule"
+    return NAME
   }
 
-  @ReactMethod
-  fun startBluetoothScan(promise: Promise) {
+  override fun startBluetoothScan(promise: Promise) {
     ThingHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
     ) { bean -> promise.resolve(TuyaReactUtils.parseToWritableMap(bean)) };
   }
 
-  @ReactMethod
-  fun stopBluetoothScan() {
-    ThingHomeSdk.getBleOperator().stopLeScan();
-  }
-
-
-  @ReactMethod
-  fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
+  override fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD), params)) {
 
       ThingHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
@@ -90,15 +87,12 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
     }
   }
 
-
-  @ReactMethod
-  fun getCurrentWifi(params: ReadableMap, successCallback: Callback,
+  override fun getCurrentWifi(params: ReadableMap, successCallback: Callback,
                      errorCallback: Callback) {
     successCallback.invoke(WiFiUtil.getCurrentSSID(reactApplicationContext.applicationContext));
   }
 
-  @ReactMethod
-  fun openNetworkSettings(params: ReadableMap) {
+  override fun openNetworkSettings(params: ReadableMap) {
     val currentActivity = currentActivity
     if (currentActivity == null) {
       return
@@ -124,8 +118,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
     }
   }
 
-  @ReactMethod
-  fun initActivator(params: ReadableMap, promise: Promise) {
+  override fun initActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD, TIME, TYPE), params)) {
       ThingHomeSdk.getActivatorInstance().getActivatorToken(params.getDouble(HOMEID).toLong(), object : IThingActivatorGetToken {
         override fun onSuccess(token: String) {
@@ -151,52 +144,9 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
 
   }
 
-  /**
-   * ZigBee子设备配网需要ZigBee网关设备云在线的情况下才能发起,且子设备处于配网状态。
-   */
-  @ReactMethod
-  fun newGwSubDevActivator(params: ReadableMap, promise: Promise) {
-    if (ReactParamsCheck.checkParams(arrayOf(DEVID, TIME), params)) {
-      val builder = ThingGwSubDevActivatorBuilder()
-        //设置网关ID
-        .setDevId(params.getString(DEVID))
-        //设置配网超时时间
-        .setTimeOut(params.getInt(TIME).toLong())
-        .setListener(object : IThingSmartActivatorListener {
-          override fun onError(var1: String, var2: String) {
-            promise.reject(var1, var2)
-          }
-
-          /**
-           * 设备配网成功,且设备上线（手机可以直接控制），可以通过
-           */
-          override fun onActiveSuccess(var1: DeviceBean) {
-            promise.resolve(TuyaReactUtils.parseToWritableMap(var1))
-          }
-
-          /**
-           * device_find 发现设备
-          device_bind_success 设备绑定成功，但还未上线，此时设备处于离线状态，无法控制设备。
-           */
-          override fun onStep(var1: String, var2: Any) {
-            // promise.reject(var1,"")
-          }
-        })
-
-      mTuyaGWActivator = ThingHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
-    }
-  }
-
-  @ReactMethod
-  fun stopConfig() {
+  override fun stopConfig() {
     mITuyaActivator?.stop()
     mTuyaGWActivator?.stop()
-  }
-
-  @ReactMethod
-  fun onDestory() {
-    mITuyaActivator?.onDestroy()
-    mTuyaGWActivator?.onDestroy()
   }
 
   fun getITuyaSmartActivatorListener(promise: Promise): IThingSmartActivatorListener {

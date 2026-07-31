@@ -80,35 +80,8 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
   }];
 }
 
-
-RCT_EXPORT_METHOD(stopConfig:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
+RCT_EXPORT_METHOD(stopConfig) {
   [[ThingSmartActivator sharedInstance] stopConfigWiFi];
-}
-
-//ZigBee子设备配网需要ZigBee网关设备云在线的情况下才能发起,且子设备处于配网状态。
-
-RCT_EXPORT_METHOD(newGwSubDevActivator:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-  NSString *deviceId = params[kTuyaRNActivatorModuleDeviceId];
-  NSNumber *time = params[kTuyaRNActivatorModuleOverTime];
-
-  if (activatorInstance == nil) {
-    activatorInstance = [TuyaRNActivatorModule new];
-  }
-
-  [ThingSmartActivator sharedInstance].delegate = activatorInstance;
-  activatorInstance.promiseResolveBlock = resolver;
-  activatorInstance.promiseRejectBlock = rejecter;
-
-  [[ThingSmartActivator sharedInstance] activeSubDeviceWithGwId:deviceId timeout:time.doubleValue];
-
-}
-
-RCT_EXPORT_METHOD(stopNewGwSubDevActivatorConfig:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-  NSString *deviceId = params[kTuyaRNActivatorModuleDeviceId];
-  [[ThingSmartActivator sharedInstance] stopActiveSubDeviceWithGwId:deviceId];
 }
 
 /**
@@ -123,18 +96,26 @@ RCT_EXPORT_METHOD(getCurrentWifi:(NSDictionary *)params success:(RCTResponseSend
   }
 }
 
-
 //判断网络
-RCT_EXPORT_METHOD(openNetworkSettings:(NSDictionary *)params resolver :(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
+RCT_EXPORT_METHOD(openNetworkSettings:(NSDictionary *)params) {
    [TuyaRNUtils openNetworkSettings];
-
 }
 
-RCT_EXPORT_METHOD(onDestory:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
+// Android-only: on iOS, this flow goes through TuyaBLEScannerModule instead
+// (see src/activator.ts's Platform.OS branch). Stubbed here only because the
+// shared TurboModule spec requires every method to be implemented on both
+// platforms.
+RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  reject(@"TuyaActivatorModule.startBluetoothScan", @"startBluetoothScan is not supported on iOS - use TuyaBLEScannerModule instead", nil);
 }
 
+// Android-only: on iOS, this flow goes through TuyaBLEActivatorModule instead
+// (see src/activator.ts's Platform.OS branch). Stubbed here only because the
+// shared TurboModule spec requires every method to be implemented on both
+// platforms.
+RCT_EXPORT_METHOD(initBluetoothDualModeActivator:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  reject(@"TuyaActivatorModule.initBluetoothDualModeActivator", @"initBluetoothDualModeActivator is not supported on iOS - use TuyaBLEActivatorModule instead", nil);
+}
 
 #pragma mark -
 #pragma mark - delegate
@@ -153,5 +134,14 @@ RCT_EXPORT_METHOD(onDestory:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromis
     self.promiseResolveBlock([deviceModel yy_modelToJSONObject]);
   }
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaActivatorModuleSpecJSI>(params);
+}
+
+#endif
 
 @end
