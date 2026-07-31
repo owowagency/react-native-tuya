@@ -11,6 +11,8 @@
 #import <ThingSmartActivatorKit/ThingSmartActivatorKit.h>
 #import <ThingSmartBaseKit/ThingSmartBaseKit.h>
 #import <ThingSmartDeviceKit/ThingSmartDeviceKit.h>
+#import <ThingBluetooth/ThingBluetooth.h>
+#import <ThingSmartBLECoreKit/ThingSmartBLECoreKit.h>
 #import <ThingSmartBLEKit/ThingSmartBLEWifiActivator.h>
 #import "TuyaRNUtils+Network.h"
 #import "YYModel.h"
@@ -74,5 +76,14 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
   }
 
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaBLEActivatorModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

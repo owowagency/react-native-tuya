@@ -10,6 +10,8 @@
 #import <ThingSmartActivatorKit/ThingSmartActivatorKit.h>
 #import <ThingSmartBaseKit/ThingSmartBaseKit.h>
 #import <ThingSmartDeviceKit/ThingSmartDeviceKit.h>
+#import <ThingBluetooth/ThingBluetooth.h>
+#import <ThingSmartBLECoreKit/ThingSmartBLECoreKit.h>
 #import <ThingSmartBLEKit/ThingSmartBLEManager+Biz.h>
 #import "TuyaRNUtils+Network.h"
 #import "YYModel.h"
@@ -45,5 +47,14 @@ RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver rejecter:(
     self.promiseResolveBlock([deviceInfo yy_modelToJSONObject]);
   }
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaBLEScannerModuleSpecJSI>(params);
+}
+
+#endif
 
 @end
