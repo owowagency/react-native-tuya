@@ -70,5 +70,13 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "codegenConfig": {
+    "name": "RNTuyaSdkSpec",
+    "type": "modules",
+    "jsSrcsDir": "specs",
+    "android": {
+      "javaPackageName": "com.tuya.smart.rnsdk"
+    }
   }
 }

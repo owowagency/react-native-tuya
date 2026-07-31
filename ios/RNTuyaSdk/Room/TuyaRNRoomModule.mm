@@ -71,27 +71,22 @@ RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolver:(RCTPromiseResolv
   
 }
 
-RCT_EXPORT_METHOD(removeGroup:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  
-  self.smartRoom = [self smartRoomWithParams:params];
-  
-  NSString *groupId = params[kTuyaRNRoomModuleGroupId];
-  
-  [self.smartRoom removeGroupWithGroupId:groupId success:^{
-    [TuyaRNUtils resolverWithHandler:resolver];
-  } failure:^(NSError *error) {
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-  }];
-  
-}
-
 #pragma mark -
 #pragma mark - init
 - (ThingSmartRoom *)smartRoomWithParams:(NSDictionary *)params {
-  
+
   NSNumber *homeId = params[kTuyaRNRoomModuleHomeId];
   NSNumber *roomId = params[kTuyaRNRoomModuleRoomId];
   return [ThingSmartRoom roomWithRoomId:roomId.longLongValue homeId:homeId.longLongValue];
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaRoomModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

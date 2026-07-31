@@ -13,8 +13,12 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "12.0" }
 
   s.source       = { :git => "https://github.com/owowagency/react-native-tuya.git", :tag => "v#{s.version}" }
-  s.source_files  = "ios/**/*.{h,m}"
+  s.source_files  = "ios/**/*.{h,m,mm}"
 
   s.dependency 'React'
   s.dependency 'ThingSmartHomeKit', '7.8.0.3'
+
+  if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
+    install_modules_dependencies(s)
+  end
 end

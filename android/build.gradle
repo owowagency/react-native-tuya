@@ -17,6 +17,18 @@ buildscript {
 }
 
 
+def isNewArchitectureEnabled() {
+    // To opt-in for the New Architecture, you can either:
+    // - Set `newArchEnabled` to true inside the `gradle.properties` file
+    // - Invoke gradle with `-newArchEnabled=true`
+    // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+if (isNewArchitectureEnabled()) {
+    apply plugin: "com.facebook.react"
+}
+
 android {
     compileSdkVersion 31
 
@@ -35,6 +47,14 @@ android {
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
+    }
+
+    sourceSets.main {
+        java {
+            if (!isNewArchitectureEnabled()) {
+                srcDirs += 'src/paper/java'
+            }
+        }
     }
 
     buildTypes {

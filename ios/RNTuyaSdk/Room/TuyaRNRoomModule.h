@@ -7,12 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <React/RCTBridgeModule.h>
 
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <RNTuyaSdkSpec/RNTuyaSdkSpec.h>
+#else
+#import <React/RCTBridgeModule.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
+#ifdef RCT_NEW_ARCH_ENABLED
+@interface TuyaRNRoomModule : NSObject<NativeTuyaRoomModuleSpec>
+#else
 @interface TuyaRNRoomModule : NSObject<RCTBridgeModule>
+#endif
 
 @end
 
