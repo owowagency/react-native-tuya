@@ -43,7 +43,7 @@ RCT_EXPORT_MODULE(TuyaActivatorModule)
  ActivatorModelEnum.TY_AP: 传入该参数则进行AP配网
  * @param timeout     配网的超时时间设置，默认是100s.
  */
-RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSNumber *homeId = params[kTuyaRNActivatorModuleHomeId];
   NSString *ssid = params[kTuyaRNActivatorModuleSSID];
@@ -87,12 +87,12 @@ RCT_EXPORT_METHOD(stopConfig) {
 /**
  获取wifi信息
  */
-RCT_EXPORT_METHOD(getCurrentWifi:(NSDictionary *)params success:(RCTResponseSenderBlock)succ failure:(RCTResponseErrorBlock)fail) {
+RCT_EXPORT_METHOD(getCurrentWifi:(NSDictionary *)params success:(RCTResponseSenderBlock)succ error:(RCTResponseSenderBlock)fail) {
   NSString *ssid = [ThingSmartActivator currentWifiSSID];
   if ([ssid isKindOfClass:[NSString class]] && ssid.length > 0) {
     succ(@[ssid]);
   } else {
-    fail(nil);
+    fail(@[]);
   }
 }
 
@@ -105,7 +105,7 @@ RCT_EXPORT_METHOD(openNetworkSettings:(NSDictionary *)params) {
 // (see src/activator.ts's Platform.OS branch). Stubbed here only because the
 // shared TurboModule spec requires every method to be implemented on both
 // platforms.
-RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   reject(@"TuyaActivatorModule.startBluetoothScan", @"startBluetoothScan is not supported on iOS - use TuyaBLEScannerModule instead", nil);
 }
 
@@ -113,7 +113,7 @@ RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolve rejecter:(R
 // (see src/activator.ts's Platform.OS branch). Stubbed here only because the
 // shared TurboModule spec requires every method to be implemented on both
 // platforms.
-RCT_EXPORT_METHOD(initBluetoothDualModeActivator:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(initBluetoothDualModeActivator:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   reject(@"TuyaActivatorModule.initBluetoothDualModeActivator", @"initBluetoothDualModeActivator is not supported on iOS - use TuyaBLEActivatorModule instead", nil);
 }
 

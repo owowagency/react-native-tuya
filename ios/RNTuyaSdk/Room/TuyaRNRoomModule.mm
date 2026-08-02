@@ -31,7 +31,7 @@ RCT_EXPORT_MODULE(TuyaRoomModule)
  *
  * @param name     新房间名称
  */
-RCT_EXPORT_METHOD(updateRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(updateRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   
   self.smartRoom = [self smartRoomWithParams:params];
   NSString *name = params[kTuyaRNRoomModuleName];
@@ -44,7 +44,7 @@ RCT_EXPORT_METHOD(updateRoom:(NSDictionary *)params resolver:(RCTPromiseResolveB
   
 }
 
-RCT_EXPORT_METHOD(addDevice:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(addDevice:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   
   self.smartRoom = [self smartRoomWithParams:params];
   NSString *deviceId = params[kTuyaRNRoomModuleDevId];
@@ -57,7 +57,7 @@ RCT_EXPORT_METHOD(addDevice:(NSDictionary *)params resolver:(RCTPromiseResolveBl
 }
 
 
-RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.smartRoom = [self smartRoomWithParams:params];
   

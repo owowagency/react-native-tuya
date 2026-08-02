@@ -30,7 +30,7 @@ static TuyaBLERNScannerModule * scannerInstance = nil;
 
 RCT_EXPORT_MODULE(TuyaBLEScannerModule)
 
-RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   if (scannerInstance == nil) {
     scannerInstance = [TuyaBLERNScannerModule new];
   }
@@ -43,8 +43,13 @@ RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver rejecter:(
 }
 
 - (void)didDiscoveryDeviceWithDeviceInfo:(ThingBLEAdvModel *)deviceInfo {
+  // This delegate callback fires once per discovered device, but promiseResolveBlock
+  // is a one-shot Promise resolver - invoking it more than once crashes under the
+  // New Architecture's TurboModule promise handling. Clear it after first use.
   if (scannerInstance.promiseResolveBlock) {
-    self.promiseResolveBlock([deviceInfo yy_modelToJSONObject]);
+    RCTPromiseResolveBlock resolve = scannerInstance.promiseResolveBlock;
+    scannerInstance.promiseResolveBlock = nil;
+    resolve([deviceInfo yy_modelToJSONObject]);
   }
 }
 

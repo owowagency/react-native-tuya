@@ -42,7 +42,7 @@ RCT_EXPORT_MODULE(TuyaHomeMemberModule)
  * @param callback
  */
 
-RCT_EXPORT_METHOD(addMember:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(addMember:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   ThingSmartHome *smartHome = [self smartHomeWithParams:params];
 
@@ -74,7 +74,7 @@ RCT_EXPORT_METHOD(addMember:(NSDictionary *)params resolver:(RCTPromiseResolveBl
  * @param id
  * @param callback
  */
-RCT_EXPORT_METHOD(removeMember:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(removeMember:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSNumber *memberId = params[kTuyaRNHomeMemberModuleMemberId];
   [self.homeMember removeHomeMemberWithMemberId:memberId.longLongValue success:^{
@@ -88,7 +88,7 @@ RCT_EXPORT_METHOD(removeMember:(NSDictionary *)params resolver:(RCTPromiseResolv
  * 查询Home下面的成员列表
  *
  */
-RCT_EXPORT_METHOD(queryMemberList:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(queryMemberList:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.smartHome = [self smartHomeWithParams:params];
   [self.smartHome getHomeMemberListWithSuccess:^(NSArray<ThingSmartHomeMemberModel *> *memberList) {

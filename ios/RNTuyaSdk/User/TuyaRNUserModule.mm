@@ -25,7 +25,7 @@ RCT_EXPORT_MODULE(TuyaUserModule)
 * @param email  邮箱账户
 * @param countryCode 国家区号
 */
-RCT_EXPORT_METHOD(getRegisterEmailValidateCode:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getRegisterEmailValidateCode:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -43,7 +43,7 @@ RCT_EXPORT_METHOD(getRegisterEmailValidateCode:(NSDictionary *)params resolver:(
 * @param email       邮箱账户
 * @param passwd      登陆密码
 */
-RCT_EXPORT_METHOD(registerAccountWithEmail:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(registerAccountWithEmail:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -63,7 +63,7 @@ RCT_EXPORT_METHOD(registerAccountWithEmail:(NSDictionary *)params resolver:(RCTP
 * @param email  邮箱账户
 * @param passwd 登陆密码
 */
-RCT_EXPORT_METHOD(loginWithEmail:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginWithEmail:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -82,7 +82,7 @@ RCT_EXPORT_METHOD(loginWithEmail:(NSDictionary *)params resolver:(RCTPromiseReso
 * @param countryCode 国家区号
 * @param email       邮箱账户
 */
-RCT_EXPORT_METHOD(getEmailValidateCode:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getEmailValidateCode:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -100,7 +100,7 @@ RCT_EXPORT_METHOD(getEmailValidateCode:(NSDictionary *)params resolver:(RCTPromi
 * @param validateCode 邮箱验证码
 * @param passwd    新密码
 */
-RCT_EXPORT_METHOD(resetEmailPassword:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(resetEmailPassword:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -114,7 +114,7 @@ RCT_EXPORT_METHOD(resetEmailPassword:(NSDictionary *)params resolver:(RCTPromise
   }];
 }
 
-RCT_EXPORT_METHOD(logout:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(logout:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   [[ThingSmartUser sharedInstance] loginOut:^{
     [TuyaRNUtils resolverWithHandler:resolver];
@@ -123,7 +123,7 @@ RCT_EXPORT_METHOD(logout:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRe
   }];
 }
 
-RCT_EXPORT_METHOD(cancelAccount:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(cancelAccount:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   [[ThingSmartUser sharedInstance] cancelAccount:^{
     [TuyaRNUtils resolverWithHandler:resolver];
@@ -133,7 +133,7 @@ RCT_EXPORT_METHOD(cancelAccount:(RCTPromiseResolveBlock)resolver rejecter:(RCTPr
 
 }
 
-RCT_EXPORT_METHOD(getCurrentUser:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getCurrentUser:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   ThingSmartUser *user = [ThingSmartUser sharedInstance];
   if (resolver) {
     NSDictionary *dic = [user yy_modelToJSONObject];

@@ -36,7 +36,7 @@ RCT_EXPORT_MODULE(TuyaHomeManagerModule)
  *
  * @param listener
  */
-RCT_EXPORT_METHOD(queryHomeList:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(queryHomeList:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   [self.homeManager getHomeListWithSuccess:^(NSArray<ThingSmartHomeModel *> *homes) {
 
@@ -72,7 +72,7 @@ RCT_EXPORT_METHOD(queryHomeList:(RCTPromiseResolveBlock)resolver rejecter:(RCTPr
  * @param rooms    房间列表
  * @param callback
  */
-RCT_EXPORT_METHOD(createHome:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(createHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *name = params[kTuyaHomeManagerModuleName];
   NSString *geoName = params[kTuyaHomeManagerModuleGeoName];
@@ -90,7 +90,7 @@ RCT_EXPORT_METHOD(createHome:(NSDictionary *)params resolver:(RCTPromiseResolveB
   }];
 }
 
-RCT_EXPORT_METHOD(joinFamily:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(joinFamily:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   NSNumber *homeIdNum = params[kTuyaHomeManagerModuleHomeId];
   NSString *action = params[kTuyaHomeManagerModuleAction];
   ThingSmartHome *newHome = [ThingSmartHome homeWithHomeId:homeIdNum.longLongValue];

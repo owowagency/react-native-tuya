@@ -24,11 +24,11 @@
 
 RCT_EXPORT_MODULE(TuyaHomeDataManagerModule)
 
-RCT_EXPORT_METHOD(getDeviceRoomBean:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getDeviceRoomBean:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
 }
 
-RCT_EXPORT_METHOD(getRoomDeviceList:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getRoomDeviceList:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   //获取room下的Device
   NSNumber *homeId = params[kTuyaRNHomeDataManagerModuleHomeId];

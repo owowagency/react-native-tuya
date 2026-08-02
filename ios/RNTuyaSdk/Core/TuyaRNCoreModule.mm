@@ -16,8 +16,8 @@ RCT_EXPORT_MODULE(TuyaCoreModule)
 //通用api
 RCT_REMAP_METHOD(apiRequest,
                  postData:(NSDictionary *)parameters
-                 resolver:(RCTPromiseResolveBlock)resolver
-                 rejecter:(RCTPromiseRejectBlock)rejecter) {
+                 resolve:(RCTPromiseResolveBlock)resolver
+                 reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *apiName       = [parameters objectForKey:@"apiName"];
   NSDictionary *postData  = [parameters objectForKey:@"postData"];

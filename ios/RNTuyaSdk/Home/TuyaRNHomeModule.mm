@@ -32,7 +32,7 @@
 
 RCT_EXPORT_MODULE(TuyaHomeModule)
 
-RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
 
@@ -63,7 +63,7 @@ RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolver:(RCTPromiseResol
  * @param geoName  地理位置的地址
  * @param callback
  */
-RCT_EXPORT_METHOD(updateHome:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(updateHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *name = params[kTuyaRNHomeModuleName];
   NSNumber *lon = params[kTuyaRNHomeModuleLon];
@@ -87,7 +87,7 @@ RCT_EXPORT_METHOD(updateHome:(NSDictionary *)params resolver:(RCTPromiseResolveB
  *
  * @param callback
  */
-RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
   [self.currentHome dismissHomeWithSuccess:^{
@@ -100,7 +100,7 @@ RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolver:(RCTPromiseResolve
 /**
  房屋排序
  */
-RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
 
@@ -121,7 +121,7 @@ RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlo
 /**
  查询房屋的列表
  */
-RCT_EXPORT_METHOD(queryRoomList:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(queryRoomList:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
 
