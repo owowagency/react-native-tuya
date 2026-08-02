@@ -14,7 +14,9 @@
     "android",
     "ios",
     "dist",
-    "RNTuyaSdk.podspec"
+    "RNTuyaSdk.podspec",
+    "app.plugin.js",
+    "plugin"
   ],
   "scripts": {
     "start": "tsdx watch",
@@ -42,25 +44,26 @@
   "author": "Kees Kluskens",
   "module": "dist/react-native-tuya.esm.js",
   "devDependencies": {
-    "@types/jest": "^25.1.2",
-    "@types/react-native": "^0.61.16",
-    "@volst/eslint-config": "^4.1.1",
-    "react-native": "^0.61.5",
-    "tsdx": "^0.12.3",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.5",
     "@commitlint/cli": "^18.1.0",
     "@commitlint/config-conventional": "^18.1.0",
+    "@expo/config-plugins": "^57.0.6",
     "@semantic-release/commit-analyzer": "^11.0.0",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^11.0.0",
+    "@types/jest": "^25.1.2",
+    "@types/react-native": "^0.61.16",
+    "@volst/eslint-config": "^4.1.1",
     "commitizen": "^4.3.0",
     "commitlint": "^18.1.0",
     "conventional-changelog-conventionalcommits": "^7.0.2",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^8.0.3",
-    "semantic-release": "^22.0.5"
+    "react-native": "^0.61.5",
+    "semantic-release": "^22.0.5",
+    "tsdx": "^0.12.3",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.5"
   },
   "config": {
     "commitizen": {
