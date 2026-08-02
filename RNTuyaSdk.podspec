@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.dependency 'React'
   s.dependency 'ThingSmartHomeKit', '7.8.0.3'
 
-  if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
-    install_modules_dependencies(s)
-  end
+  # New Architecture has been mandatory (and non-optional) since React Native
+  # 0.82, so this is no longer conditional on RCT_NEW_ARCH_ENABLED.
+  install_modules_dependencies(s)
 end
