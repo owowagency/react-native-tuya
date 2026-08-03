@@ -5,6 +5,7 @@ const {
   withInfoPlist,
   withAndroidManifest,
   withProjectBuildGradle,
+  withAppBuildGradle,
   withAppDelegate,
   withMainApplication,
 } = require('@expo/config-plugins');
@@ -235,6 +236,27 @@ function withTuyaAndroidAar(config, { androidAarPath }) {
   ]);
 }
 
+function withTuyaAndroidAarDependency(config) {
+  return withAppBuildGradle(config, (config) => {
+    const marker = `// ${MARKER}: closed-source aar dependency`;
+    if (config.modResults.contents.includes(marker)) {
+      return config;
+    }
+
+    // withTuyaAndroidAar only copies the .aar into app/libs/ - it still needs
+    // to be declared as a dependency, or Gradle never compiles it in (the
+    // native libthing_security_algorithm.so silently ends up missing from
+    // the APK, and Tuya's JNI calls crash at runtime with UnsatisfiedLinkError).
+    const dependencyLine = `    ${marker}\n    implementation fileTree(dir: "libs", include: ["*.aar"])\n`;
+    config.modResults.contents = config.modResults.contents.replace(
+      /(dependencies\s*\{\n)/,
+      `$1${dependencyLine}`
+    );
+
+    return config;
+  });
+}
+
 function withTuyaMainApplication(config, { appKey, secretKey }) {
   return withMainApplication(config, (config) => {
     const marker = `${MARKER}: Tuya SDK init`;
@@ -303,6 +325,7 @@ function withTuya(config, props) {
   config = withTuyaAndroidManifest(config);
   config = withTuyaProjectBuildGradle(config);
   config = withTuyaAndroidAar(config, { androidAarPath });
+  config = withTuyaAndroidAarDependency(config);
   config = withTuyaMainApplication(config, { appKey: androidAppKey, secretKey: androidSecretKey });
 
   return config;
