@@ -88,3 +88,26 @@ export function updateTimerStatusWithTask(
 ): Promise<any> {
   return tuya.updateTimerStatusWithTask(params);
 }
+
+export type UpdateTimerTaskStatusWithTaskParams = {
+  devId: number;
+  taskName: string;
+  status: number;
+};
+
+export function updateTimerTaskStatusWithTask(
+  params: UpdateTimerTaskStatusWithTaskParams
+): Promise<any> {
+  return tuya.updateTimerTaskStatusWithTask(params);
+}
+
+export type GetTimerWithTaskParams = {
+  devId: number;
+  taskName: string;
+};
+
+export function getTimerWithTask(
+  params: GetTimerWithTaskParams
+): Promise<any> {
+  return tuya.getTimerWithTask(params);
+}

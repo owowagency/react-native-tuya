@@ -101,6 +101,18 @@ class TuyaDeviceModule(reactContext: ReactApplicationContext) : NativeTuyaDevice
         }
     }
 
+    override fun getDeviceData(params: ReadableMap, promise: Promise) {
+        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
+            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getDeviceBean(params.getString(DEVID))))
+        }
+    }
+
+    override fun onDestroy(params: ReadableMap) {
+        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
+            getDevice(params.getString(DEVID) as String)?.onDestroy()
+        }
+    }
+
     override fun send(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID, COMMAND), params)) {
             getDevice(params.getString(DEVID) as String)?.publishDps(JSONObject.toJSONString(TuyaReactUtils.parseToMap(params.getMap(COMMAND) as ReadableMap))
@@ -128,6 +140,15 @@ class TuyaDeviceModule(reactContext: ReactApplicationContext) : NativeTuyaDevice
     override fun removeDevice(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             getDevice(params.getString(DEVID) as String)?.removeDevice(getIResultCallback(promise))
+        }
+    }
+
+    override fun getDp(params: ReadableMap, promise: Promise) {
+        if (ReactParamsCheck.checkParams(arrayOf(DEVID, DPID), params)) {
+            promise.resolve(getDevice(params.getString(DEVID) as String)?.getDp(
+                    params.getString(DPID),
+                    getIResultCallback(promise)
+            ))
         }
     }
 

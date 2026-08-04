@@ -75,3 +75,90 @@ export type SortRoomsParams = {
 export function sortRoom(params: SortRoomsParams): Promise<string> {
   return tuya.sortRoom(params);
 }
+
+export type AddRoomParams = {
+  homeId: number;
+  name: string;
+};
+
+export function addRoom(params: AddRoomParams): Promise<string> {
+  return tuya.addRoom(params);
+}
+
+export type RemoveRoomParams = {
+  homeId: number;
+  roomId: number;
+};
+
+export function removeRoom(params: RemoveRoomParams): Promise<string> {
+  return tuya.removeRoom(params);
+}
+
+export type GetHomeLocalCacheParams = {
+  homeId: number;
+};
+
+export function getHomeLocalCache(
+  params: GetHomeLocalCacheParams
+): Promise<GetHomeDetailResponse> {
+  return tuya.getHomeLocalCache(params);
+}
+
+export type SortHomeParams = {
+  idList: number[];
+  homeId: number;
+};
+
+export function sortHome(params: SortHomeParams): Promise<string> {
+  return tuya.sortHome(params);
+}
+
+export type CreateGroupParams = {
+  homeId: number;
+  productId: string;
+  name: string;
+  devIdList: string[];
+};
+
+export function createGroup(params: CreateGroupParams): Promise<number> {
+  return tuya.createGroup(params);
+}
+
+export type RegisterHomeStatusListenerParams = {
+  homeId: number;
+};
+
+export function registerHomeStatusListener(
+  params: RegisterHomeStatusListenerParams
+): void {
+  tuya.registerHomeStatusListener(params);
+}
+
+export type UnRegisterHomeStatusListenerParams = {
+  homeId: number;
+};
+
+export function unRegisterHomeStatusListener(
+  params: UnRegisterHomeStatusListenerParams
+): void {
+  tuya.unRegisterHomeStatusListener(params);
+}
+
+export type QueryDeviceListToAddGroupParams = {
+  homeId: number;
+  productId: string;
+};
+
+export function queryDeviceListToAddGroup(
+  params: QueryDeviceListToAddGroupParams
+): Promise<any[]> {
+  return tuya.queryDeviceListToAddGroup(params);
+}
+
+export type OnDestroyHomeParams = {
+  homeId: number;
+};
+
+export function onDestroyHome(params: OnDestroyHomeParams): void {
+  tuya.onDestroy(params);
+}

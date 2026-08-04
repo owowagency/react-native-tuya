@@ -7,6 +7,7 @@ import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.api.IThingRoom
 import com.tuya.smart.rnsdk.utils.Constant.NAME
 import com.tuya.smart.rnsdk.utils.Constant.DEVID
+import com.tuya.smart.rnsdk.utils.Constant.GROUPID
 import com.tuya.smart.rnsdk.utils.Constant.ROOMID
 import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
 import com.tuya.smart.rnsdk.utils.ReactParamsCheck
@@ -40,6 +41,20 @@ class TuyaRoomModule(reactContext: ReactApplicationContext) : NativeTuyaRoomModu
     override fun removeDevice(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(ROOMID, DEVID), params)) {
             getRoomInstance(params.getDouble(ROOMID)).removeDevice(params.getString(DEVID), getIResultCallback(promise))
+        }
+    }
+
+    /* 删除群组  */
+    override fun removeGroup(params: ReadableMap, promise: Promise) {
+        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, GROUPID), params)) {
+            getRoomInstance(params.getDouble(ROOMID)).removeGroup(params.getDouble(GROUPID).toLong(), getIResultCallback(promise))
+        }
+    }
+
+    /* 添加群组  */
+    override fun addGroup(params: ReadableMap, promise: Promise) {
+        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, GROUPID), params)) {
+            getRoomInstance(params.getDouble(ROOMID)).addGroup(params.getDouble(GROUPID).toLong(), getIResultCallback(promise))
         }
     }
 

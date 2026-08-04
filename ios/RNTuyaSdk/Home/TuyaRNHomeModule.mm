@@ -14,6 +14,7 @@
 #import <ThingSmartDeviceKit/ThingSmartRoomModel.h>
 #import "TuyaRNUtils+Cache.h"
 #import "TuyaRNUtils+DeviceParser.h"
+#import "TuyaRNHomeListener.h"
 
 #define kTuyaRNHomeModuleHomeId @"homeId"
 #define kTuyaRNHomeModuleName @"name"
@@ -52,6 +53,16 @@ RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolve:(RCTPromiseResolv
   } failure:^(NSError *error) {
     [TuyaRNUtils rejecterWithError:error handler:rejecter];
   }];
+}
+
+/**
+ * 获取本地缓存中的数据信息
+ */
+RCT_EXPORT_METHOD(getHomeLocalCache:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  self.currentHome = [self smartHomeWithParams:params];
+  if(resolver) {
+    resolver([self.currentHome yy_modelToJSONObject]);
+  }
 }
 
 /**
@@ -98,6 +109,42 @@ RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolve:(RCTPromiseResolveB
 }
 
 /**
+ * 添加房间
+ *
+ * @param name
+ * @param callback
+ */
+RCT_EXPORT_METHOD(addRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+
+  self.currentHome = [self smartHomeWithParams:params];
+  NSString *name = params[kTuyaRNHomeModuleName];
+  [self.currentHome addHomeRoomWithName:name success:^{
+    [TuyaRNUtils resolverWithHandler:resolver];
+  } failure:^(NSError *error) {
+    [TuyaRNUtils rejecterWithError:error handler:rejecter];
+  }];
+}
+
+/**
+ * 移除房间
+ *
+ * @param roomId
+ * @param callback
+ */
+RCT_EXPORT_METHOD(removeRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+
+  self.currentHome = [self smartHomeWithParams:params];
+  NSNumber *roomId = params[kTuyaRNHomeModuleRoomId];
+
+  [self.currentHome removeHomeRoomWithRoomId:roomId.longLongValue success:^{
+    [TuyaRNUtils resolverWithHandler:resolver];
+  } failure:^(NSError *error) {
+    [TuyaRNUtils rejecterWithError:error handler:rejecter];
+  }];
+
+}
+
+/**
  房屋排序
  */
 RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
@@ -116,6 +163,20 @@ RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBloc
   } failure:^(NSError *error) {
     [TuyaRNUtils rejecterWithError:error handler:rejecter];
   }];
+}
+
+/**
+ * sortHome was never implemented on iOS even in the pre-TurboModule bridge
+ * module (Android-only feature - it calls a distinct IThingHome.sortHome
+ * SDK method that doesn't have a verified iOS equivalent here). Left
+ * unimplemented for parity with that history rather than guessing at a
+ * closed-source SDK call; rejects clearly instead of silently doing the
+ * wrong thing.
+ */
+RCT_EXPORT_METHOD(sortHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  if (rejecter) {
+    rejecter(@"not_implemented", @"sortHome is not implemented on iOS", nil);
+  }
 }
 
 /**
@@ -148,6 +209,48 @@ RCT_EXPORT_METHOD(queryRoomList:(NSDictionary *)params resolve:(RCTPromiseResolv
   } failure:^(NSError *error) {
     [TuyaRNUtils rejecterWithError:error handler:rejecter];
   }];
+}
+
+/**
+ * createGroup was never implemented on iOS, even in the pre-TurboModule
+ * bridge module. Rejects clearly rather than leaving the JS promise
+ * hanging or guessing at a closed-source SDK call.
+ */
+RCT_EXPORT_METHOD(createGroup:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  if (rejecter) {
+    rejecter(@"not_implemented", @"createGroup is not implemented on iOS", nil);
+  }
+}
+
+/**
+ 注册 Home信息监听
+
+ */
+RCT_EXPORT_METHOD(registerHomeStatusListener:(NSDictionary *)params) {
+
+  NSNumber *homeIdNum = params[kTuyaRNHomeModuleHomeId];
+  if (!homeIdNum || homeIdNum.longLongValue <= 0) {
+    return;
+  }
+  [[TuyaRNHomeListener shareInstance] registerHomeStatusWithSmartHome:[ThingSmartHome homeWithHomeId:homeIdNum.longLongValue]];
+}
+
+/**
+ 取消Home注册监听
+
+ */
+RCT_EXPORT_METHOD(unRegisterHomeStatusListener:(NSDictionary *)params) {
+  [[TuyaRNHomeListener shareInstance] removeHomeStatusSmartHome];
+}
+
+//
+RCT_EXPORT_METHOD(queryDeviceListToAddGroup:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+
+
+}
+
+RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params) {
+
 }
 
 #pragma mark -

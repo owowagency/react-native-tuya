@@ -71,6 +71,26 @@ RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolve:(RCTPromiseResolve
   
 }
 
+RCT_EXPORT_METHOD(removeGroup:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+
+  self.smartRoom = [self smartRoomWithParams:params];
+
+  NSString *groupId = params[kTuyaRNRoomModuleGroupId];
+
+  [self.smartRoom removeGroupWithGroupId:groupId success:^{
+    [TuyaRNUtils resolverWithHandler:resolver];
+  } failure:^(NSError *error) {
+    [TuyaRNUtils rejecterWithError:error handler:rejecter];
+  }];
+
+}
+
+// addGroup only ever existed on Android - no-op here so the shared
+// TurboModule spec compiles on both platforms.
+RCT_EXPORT_METHOD(addGroup:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  [TuyaRNUtils resolverWithHandler:resolver];
+}
+
 #pragma mark -
 #pragma mark - init
 - (ThingSmartRoom *)smartRoomWithParams:(NSDictionary *)params {

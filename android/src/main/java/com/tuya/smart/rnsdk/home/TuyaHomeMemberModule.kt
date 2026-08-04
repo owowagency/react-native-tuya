@@ -52,6 +52,13 @@ class TuyaHomeMemberModule(reactContext: ReactApplicationContext) : NativeTuyaHo
         }
     }
 
+    /* 更新成员备注名和权限 */
+    override fun updateMember(params: ReadableMap, promise: Promise) {
+        if (ReactParamsCheck.checkParams(arrayOf(Constant.MEMBERID, Constant.NAME, Constant.ADMIN),params)) {
+            ThingHomeSdk.getMemberInstance().updateMember(params.getDouble(Constant.MEMBERID).toLong(),params.getString(Constant.NAME),params.getBoolean(Constant.ADMIN), Constant.getIResultCallback(promise))
+        }
+    }
+
     /* 查询Home下面的成员列表 */
     override fun queryMemberList(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(Constant.HOMEID),params)) {

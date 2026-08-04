@@ -84,6 +84,31 @@ RCT_EXPORT_METHOD(stopConfig) {
   [[ThingSmartActivator sharedInstance] stopConfigWiFi];
 }
 
+//ZigBee子设备配网需要ZigBee网关设备云在线的情况下才能发起,且子设备处于配网状态。
+
+RCT_EXPORT_METHOD(newGwSubDevActivator:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+
+  NSString *deviceId = params[kTuyaRNActivatorModuleDeviceId];
+  NSNumber *time = params[kTuyaRNActivatorModuleOverTime];
+
+  if (activatorInstance == nil) {
+    activatorInstance = [TuyaRNActivatorModule new];
+  }
+
+  [ThingSmartActivator sharedInstance].delegate = activatorInstance;
+  activatorInstance.promiseResolveBlock = resolver;
+  activatorInstance.promiseRejectBlock = rejecter;
+
+  [[ThingSmartActivator sharedInstance] activeSubDeviceWithGwId:deviceId timeout:time.doubleValue];
+
+}
+
+RCT_EXPORT_METHOD(stopNewGwSubDevActivatorConfig:(NSDictionary *)params) {
+
+  NSString *deviceId = params[kTuyaRNActivatorModuleDeviceId];
+  [[ThingSmartActivator sharedInstance] stopActiveSubDeviceWithGwId:deviceId];
+}
+
 /**
  获取wifi信息
  */
@@ -101,12 +126,22 @@ RCT_EXPORT_METHOD(openNetworkSettings:(NSDictionary *)params) {
    [TuyaRNUtils openNetworkSettings];
 }
 
+RCT_EXPORT_METHOD(onDestory) {
+}
+
 // Android-only: on iOS, this flow goes through TuyaBLEScannerModule instead
 // (see src/activator.ts's Platform.OS branch). Stubbed here only because the
 // shared TurboModule spec requires every method to be implemented on both
 // platforms.
 RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   reject(@"TuyaActivatorModule.startBluetoothScan", @"startBluetoothScan is not supported on iOS - use TuyaBLEScannerModule instead", nil);
+}
+
+// Android-only: on iOS, this flow goes through TuyaBLEScannerModule instead
+// (see src/activator.ts's Platform.OS branch). Stubbed here only because the
+// shared TurboModule spec requires every method to be implemented on both
+// platforms.
+RCT_EXPORT_METHOD(stopBluetoothScan) {
 }
 
 // Android-only: on iOS, this flow goes through TuyaBLEActivatorModule instead

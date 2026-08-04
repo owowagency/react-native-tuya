@@ -8,6 +8,7 @@ import com.thingclips.smart.android.ble.api.ScanType
 import com.thingclips.smart.android.common.utils.WiFiUtil
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.builder.ActivatorBuilder
+import com.thingclips.smart.home.sdk.builder.ThingGwSubDevActivatorBuilder
 import com.thingclips.smart.sdk.api.IMultiModeActivatorListener
 import com.thingclips.smart.sdk.api.IThingActivator
 import com.thingclips.smart.sdk.api.IThingActivatorGetToken
@@ -17,6 +18,7 @@ import com.thingclips.smart.sdk.bean.MultiModeActivatorBean
 import com.thingclips.smart.sdk.enums.ActivatorModelEnum
 import com.tuya.smart.rnsdk.NativeTuyaActivatorModuleSpec
 import com.tuya.smart.rnsdk.utils.*
+import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.HOMEID
 import com.tuya.smart.rnsdk.utils.Constant.PASSWORD
 import com.tuya.smart.rnsdk.utils.Constant.SSID
@@ -40,6 +42,10 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : NativeTuyaAct
   override fun startBluetoothScan(promise: Promise) {
     ThingHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
     ) { bean -> promise.resolve(TuyaReactUtils.parseToWritableMap(bean)) };
+  }
+
+  override fun stopBluetoothScan() {
+    ThingHomeSdk.getBleOperator().stopLeScan();
   }
 
   override fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
@@ -144,9 +150,57 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : NativeTuyaAct
 
   }
 
+  /**
+   * ZigBee子设备配网需要ZigBee网关设备云在线的情况下才能发起,且子设备处于配网状态。
+   */
+  override fun newGwSubDevActivator(params: ReadableMap, promise: Promise) {
+    if (ReactParamsCheck.checkParams(arrayOf(DEVID, TIME), params)) {
+      val builder = ThingGwSubDevActivatorBuilder()
+        //设置网关ID
+        .setDevId(params.getString(DEVID))
+        //设置配网超时时间
+        .setTimeOut(params.getInt(TIME).toLong())
+        .setListener(object : IThingSmartActivatorListener {
+          override fun onError(var1: String, var2: String) {
+            promise.reject(var1, var2)
+          }
+
+          /**
+           * 设备配网成功,且设备上线（手机可以直接控制），可以通过
+           */
+          override fun onActiveSuccess(var1: DeviceBean) {
+            promise.resolve(TuyaReactUtils.parseToWritableMap(var1))
+          }
+
+          /**
+           * device_find 发现设备
+          device_bind_success 设备绑定成功，但还未上线，此时设备处于离线状态，无法控制设备。
+           */
+          override fun onStep(var1: String, var2: Any) {
+            // promise.reject(var1,"")
+          }
+        })
+
+      mTuyaGWActivator = ThingHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
+    }
+  }
+
+  // iOS-only in practice: there's no Android equivalent - the gateway
+  // sub-device activator started via newGwSubDevActivator is stopped
+  // through the shared stopConfig() instead. Stubbed here only because the
+  // shared TurboModule spec requires every method to be implemented on both
+  // platforms.
+  override fun stopNewGwSubDevActivatorConfig(params: ReadableMap) {
+  }
+
   override fun stopConfig() {
     mITuyaActivator?.stop()
     mTuyaGWActivator?.stop()
+  }
+
+  override fun onDestory() {
+    mITuyaActivator?.onDestroy()
+    mTuyaGWActivator?.onDestroy()
   }
 
   fun getITuyaSmartActivatorListener(promise: Promise): IThingSmartActivatorListener {

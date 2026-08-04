@@ -49,3 +49,19 @@ export type JoinFamilyParams = {
 export function joinFamily(params: JoinFamilyParams) {
   return tuya.joinFamily(params);
 }
+
+export type HomeChangeListenerParams = {
+  homeId: number;
+};
+
+export function registerTuyaHomeChangeListener(
+  params: HomeChangeListenerParams
+): void {
+  tuya.registerTuyaHomeChangeListener(params);
+}
+
+export function unregisterTuyaHomeChangeListener(
+  params: HomeChangeListenerParams
+): void {
+  tuya.unregisterTuyaHomeChangeListener(params);
+}

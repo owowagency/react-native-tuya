@@ -11,6 +11,8 @@
 #import <ThingSmartDeviceKit/ThingSmartHomeManager.h>
 #import "YYModel.h"
 #import "TuyaRNUtils.h"
+#import "TuyaRNHomeManagerListener.h"
+#import "TuyaRNHomeListener.h"
 
 #define kTuyaHomeManagerModuleName @"name"
 #define kTuyaHomeManagerModuleLon @"lon"
@@ -100,6 +102,39 @@ RCT_EXPORT_METHOD(joinFamily:(NSDictionary *)params resolve:(RCTPromiseResolveBl
   } failure:^(NSError *error) {
     [TuyaRNUtils rejecterWithError:error handler:rejecter];
   }];
+}
+
+/**
+ * 注册家庭信息的变更
+ * 有：家庭的增加、删除、信息变更、分享列表的变更和服务器连接成功的监听
+ *
+ * @param listener
+ */
+RCT_EXPORT_METHOD(registerTuyaHomeChangeListener:(NSDictionary *)params) {
+
+  NSNumber *homeIdNum = params[kTuyaHomeManagerModuleHomeId];
+  if (!homeIdNum || homeIdNum.longLongValue <= 0) {
+    return;
+  }
+  //开始监听家庭的情况
+  [[TuyaRNHomeManagerListener sharedInstance] registerSmartHomeManager:[ThingSmartHomeManager new]];
+  [[TuyaRNHomeListener shareInstance] registerHomeChangeWithSmartHome:[ThingSmartHome homeWithHomeId:homeIdNum.longLongValue]];
+}
+
+/**
+ * 注销家庭信息的变更
+ *
+ * @param listener
+ */
+RCT_EXPORT_METHOD(unregisterTuyaHomeChangeListener:(NSDictionary *)params) {
+
+  //结束家庭的监听情况
+  [[TuyaRNHomeManagerListener sharedInstance] removeSmartHomeManager];
+  [[TuyaRNHomeListener shareInstance] removeHomeChangeSmartHome];
+}
+
+RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
+
 }
 
 #pragma mark -

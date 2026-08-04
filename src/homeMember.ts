@@ -46,3 +46,13 @@ export type RemoveMemberParams = {
 export function removeMember(params: RemoveMemberParams): Promise<any> {
   return tuya.removeMember(params);
 }
+
+export type UpdateMemberParams = {
+  memberId: number;
+  name: string;
+  admin: boolean;
+};
+
+export function updateMember(params: UpdateMemberParams): Promise<any> {
+  return tuya.updateMember(params);
+}

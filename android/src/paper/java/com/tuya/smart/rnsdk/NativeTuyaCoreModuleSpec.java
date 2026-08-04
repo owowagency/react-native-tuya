@@ -26,4 +26,36 @@ public abstract class NativeTuyaCoreModuleSpec extends ReactContextBaseJavaModul
   @ReactMethod
   @DoNotStrip
   public abstract void apiRequest(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void initWithoutOptions();
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void initWithOptions(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void setOnNeedLoginListener();
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void exitApp();
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void openNetworkSettings(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void onDestory(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void setLocation(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void getLocationData(Promise promise);
 }

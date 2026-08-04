@@ -15,6 +15,7 @@
 
 #define kTuyaDeviceModuleDevId @"devId"
 #define kTuyaDeviceModuleCommand @"command"
+#define kTuyaDeviceModuleDpId @"dpId"
 #define kTuyaDeviceModuleDeviceName @"name"
 
 @interface TuyaRNDeviceModule()
@@ -68,6 +69,21 @@ RCT_EXPORT_METHOD(unRegisterDevListener:(NSDictionary *)params) {
 }
 
 
+/**
+ 查询单个dp数据
+ */
+RCT_EXPORT_METHOD(getDp:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+
+  NSString *dpId = params[kTuyaDeviceModuleDpId];
+  //读取dp点
+  self.smartDevice  = [self smartDeviceWithParams:params];
+  if (self.smartDevice) {
+    if (resolver) {
+      resolver(self.smartDevice.deviceModel.dps[dpId]?:@"");
+    }
+  }
+}
+
 /*
  * 通过局域网或者云端这两种方式发送控制指令给设备。send(通过局域网或者云端这两种方式发送控制指令给设备。)
  command的格式应符合{key:value} 例如 {"1":true}
@@ -112,6 +128,10 @@ RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolve:(RCTPromiseResolve
   } failure:^(NSError *error) {
     [TuyaRNUtils rejecterWithError:error handler:rejecter];
   }];
+}
+
+RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params) {
+
 }
 
 // 下发升级指令：

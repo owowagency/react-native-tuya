@@ -24,11 +24,23 @@ public abstract class NativeTuyaTimerModuleSpec extends ReactContextBaseJavaModu
 
   @ReactMethod
   @DoNotStrip
+  public abstract void initWithOptions(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void onDestory(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
   public abstract void addTimerWithTask(ReadableMap params, Promise promise);
 
   @ReactMethod
   @DoNotStrip
   public abstract void getTimerTaskStatusWithDeviceId(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void updateTimerTaskStatusWithTask(ReadableMap params, Promise promise);
 
   @ReactMethod
   @DoNotStrip
@@ -41,6 +53,10 @@ public abstract class NativeTuyaTimerModuleSpec extends ReactContextBaseJavaModu
   @ReactMethod
   @DoNotStrip
   public abstract void updateTimerWithTask(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void getTimerWithTask(ReadableMap params, Promise promise);
 
   @ReactMethod
   @DoNotStrip

@@ -34,4 +34,12 @@ public abstract class NativeTuyaRoomModuleSpec extends ReactContextBaseJavaModul
   @ReactMethod
   @DoNotStrip
   public abstract void removeDevice(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void removeGroup(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void addGroup(ReadableMap params, Promise promise);
 }

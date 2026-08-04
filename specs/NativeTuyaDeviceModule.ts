@@ -5,6 +5,9 @@ export interface Spec extends TurboModule {
   // Note: not implemented on iOS today (pre-existing limitation, see
   // src/api/device.ts's TODO comment) - stubbed there to reject cleanly.
   getDevice(params: Object): Promise<Object>;
+  getDeviceData(params: Object): Promise<Object>;
+  onDestroy(params: Object): void;
+  getDp(params: Object): Promise<Object>;
   registerDevListener(params: Object): void;
   unRegisterDevListener(params: Object): void;
   send(params: Object): Promise<Object>;

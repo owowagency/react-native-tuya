@@ -28,6 +28,10 @@ public abstract class NativeTuyaHomeModuleSpec extends ReactContextBaseJavaModul
 
   @ReactMethod
   @DoNotStrip
+  public abstract void getHomeLocalCache(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
   public abstract void updateHome(ReadableMap params, Promise promise);
 
   @ReactMethod
@@ -36,9 +40,41 @@ public abstract class NativeTuyaHomeModuleSpec extends ReactContextBaseJavaModul
 
   @ReactMethod
   @DoNotStrip
+  public abstract void addRoom(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void removeRoom(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
   public abstract void sortRoom(ReadableMap params, Promise promise);
 
   @ReactMethod
   @DoNotStrip
+  public abstract void sortHome(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
   public abstract void queryRoomList(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void createGroup(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void registerHomeStatusListener(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void unRegisterHomeStatusListener(ReadableMap params);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void queryDeviceListToAddGroup(ReadableMap params, Promise promise);
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void onDestroy(ReadableMap params);
 }

@@ -20,6 +20,14 @@
 
 RCT_EXPORT_MODULE(TuyaTimerModule)
 
+RCT_EXPORT_METHOD(initWithOptions:(NSDictionary *)params) {
+
+}
+
+RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
+
+}
+
 // 增加定时器,带有自己定义dp点：
 RCT_EXPORT_METHOD(addTimerWithTask:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   ThingSmartTimer *timer = [[ThingSmartTimer alloc] init];
@@ -49,6 +57,19 @@ RCT_EXPORT_METHOD(getTimerTaskStatusWithDeviceId:(NSDictionary *)params resolve:
 
       if (resolver) {
         resolver(res);
+      }
+    } failure:^(NSError *error) {
+      [TuyaRNUtils rejecterWithError:error handler:rejecter];
+    }];
+}
+
+// 控制定时任务中所有定时器的开关状态：
+RCT_EXPORT_METHOD(updateTimerTaskStatusWithTask:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+    ThingSmartTimer *timer = [[ThingSmartTimer alloc] init];
+    self.timer = timer;
+    [timer updateTimerTaskStatusWithTask:params[@"taskName"] bizId:params[@"devId"] bizType:0 updateType:[params[@"status"] integerValue] success:^{
+      if (resolver) {
+        resolver(@"success");
       }
     } failure:^(NSError *error) {
       [TuyaRNUtils rejecterWithError:error handler:rejecter];
@@ -93,6 +114,27 @@ RCT_EXPORT_METHOD(updateTimerWithTask:(NSDictionary *)params resolve:(RCTPromise
     [timer updateTimerWithTimerId:params[@"timerId"] loops:params[@"loops"] bizId:params[@"devId"] bizType:0 time:params[@"time"] dps:params[@"dps"] status:YES isAppPush:NO aliasName:@"" success:^{
         if (resolver) {
           resolver(@"success");
+        }
+    } failure:^(NSError *error) {
+      [TuyaRNUtils rejecterWithError:error handler:rejecter];
+    }];
+}
+
+// 获取定时任务下所有定时器：
+RCT_EXPORT_METHOD(getTimerWithTask:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+    ThingSmartTimer *timer = [[ThingSmartTimer alloc] init];
+    self.timer = timer;
+
+    [timer getTimerListWithTask:params[@"taskName"] bizId:params[@"devId"] bizType:0 success:^(NSArray<ThingTimerModel *> *list) {
+
+        NSMutableArray *res = [NSMutableArray array];
+        for (ThingTimerModel *item in list) {
+          NSDictionary *dic = [item yy_modelToJSONObject];
+          [res addObject:dic];
+        }
+
+        if (resolver) {
+          resolver(res);
         }
     } failure:^(NSError *error) {
       [TuyaRNUtils rejecterWithError:error handler:rejecter];
