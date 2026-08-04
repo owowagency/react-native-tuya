@@ -109,6 +109,10 @@ function withTuyaInfoPlist(config, props) {
       props.locationWhenInUseUsageDescription ??
       config.modResults.NSLocationWhenInUseUsageDescription ??
       'Your location is used to set up your device.';
+    config.modResults.NSLocationAlwaysAndWhenInUseUsageDescription =
+      props.locationAlwaysUsageDescription ??
+      config.modResults.NSLocationAlwaysAndWhenInUseUsageDescription ??
+      'Your location is used to set up your device.';
 
     const backgroundModes = new Set(config.modResults.UIBackgroundModes ?? []);
     backgroundModes.add('bluetooth-central');
