@@ -2,8 +2,8 @@
   "version": "1.0.0-RC.2",
   "license": "MIT",
   "private": false,
-  "main": "src/index.ts",
-  "typings": "src/index.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "keywords": [
     "react-native",
     "tuyasmart",
@@ -14,6 +14,7 @@
     "android",
     "ios",
     "dist",
+    "specs",
     "RNTuyaSdk.podspec",
     "app.plugin.js",
     "plugin"
