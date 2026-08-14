@@ -76,7 +76,9 @@ export function renameDevice(params: RenameDeviceParams): Promise<string> {
 
 export type GetDeviceDataParams = { devId: string };
 
-export function getDeviceData(params: GetDeviceDataParams): Promise<DeviceBean> {
+export function getDeviceData(
+  params: GetDeviceDataParams
+): Promise<DeviceBean> {
   return tuya.getDeviceData(params);
 }
 

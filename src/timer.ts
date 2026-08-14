@@ -106,8 +106,6 @@ export type GetTimerWithTaskParams = {
   taskName: string;
 };
 
-export function getTimerWithTask(
-  params: GetTimerWithTaskParams
-): Promise<any> {
+export function getTimerWithTask(params: GetTimerWithTaskParams): Promise<any> {
   return tuya.getTimerWithTask(params);
 }

@@ -56,9 +56,7 @@ export function getMeshGroupList(params: { meshId: string }): Promise<any[]> {
   return tuya.getMeshGroupList(params);
 }
 
-export function getMeshDeviceList(params: {
-  meshId: string;
-}): Promise<any[]> {
+export function getMeshDeviceList(params: { meshId: string }): Promise<any[]> {
   return tuya.getMeshDeviceList(params);
 }
 
