@@ -11,9 +11,6 @@
 #import "TuyaRNUtils.h"
 #import <ThingSmartDeviceKit/ThingSmartHome.h>
 #import <ThingSmartDeviceKit/ThingSmartHomeModel.h>
-#import <ThingSmartDeviceKit/ThingSmartShareDeviceModel.h>
-#import <ThingSmartDeviceKit/ThingSmartGroup+DpCode.h>
-#import <ThingSmartBaseKit/ThingSmartRequest.h>
 #import <ThingSmartDeviceKit/ThingSmartRoomModel.h>
 #import "TuyaRNUtils+Cache.h"
 #import "TuyaRNUtils+DeviceParser.h"
@@ -36,7 +33,7 @@
 
 RCT_EXPORT_MODULE(TuyaHomeModule)
 
-RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
 
@@ -58,8 +55,10 @@ RCT_EXPORT_METHOD(getHomeDetail:(NSDictionary *)params resolver:(RCTPromiseResol
   }];
 }
 
-
-RCT_EXPORT_METHOD(getHomeLocalCache:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+/**
+ * 获取本地缓存中的数据信息
+ */
+RCT_EXPORT_METHOD(getHomeLocalCache:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   self.currentHome = [self smartHomeWithParams:params];
   if(resolver) {
     resolver([self.currentHome yy_modelToJSONObject]);
@@ -75,7 +74,7 @@ RCT_EXPORT_METHOD(getHomeLocalCache:(NSDictionary *)params resolver:(RCTPromiseR
  * @param geoName  地理位置的地址
  * @param callback
  */
-RCT_EXPORT_METHOD(updateHome:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(updateHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *name = params[kTuyaRNHomeModuleName];
   NSNumber *lon = params[kTuyaRNHomeModuleLon];
@@ -94,13 +93,12 @@ RCT_EXPORT_METHOD(updateHome:(NSDictionary *)params resolver:(RCTPromiseResolveB
                        }];
 }
 
-
 /**
  * 解散家庭
  *
  * @param callback
  */
-RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
   [self.currentHome dismissHomeWithSuccess:^{
@@ -116,7 +114,7 @@ RCT_EXPORT_METHOD(dismissHome:(NSDictionary *)params resolver:(RCTPromiseResolve
  * @param name
  * @param callback
  */
-RCT_EXPORT_METHOD(addRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(addRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
   NSString *name = params[kTuyaRNHomeModuleName];
@@ -133,7 +131,7 @@ RCT_EXPORT_METHOD(addRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBloc
  * @param roomId
  * @param callback
  */
-RCT_EXPORT_METHOD(removeRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(removeRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
   NSNumber *roomId = params[kTuyaRNHomeModuleRoomId];
@@ -149,7 +147,7 @@ RCT_EXPORT_METHOD(removeRoom:(NSDictionary *)params resolver:(RCTPromiseResolveB
 /**
  房屋排序
  */
-RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
 
@@ -168,9 +166,23 @@ RCT_EXPORT_METHOD(sortRoom:(NSDictionary *)params resolver:(RCTPromiseResolveBlo
 }
 
 /**
+ * sortHome was never implemented on iOS even in the pre-TurboModule bridge
+ * module (Android-only feature - it calls a distinct IThingHome.sortHome
+ * SDK method that doesn't have a verified iOS equivalent here). Left
+ * unimplemented for parity with that history rather than guessing at a
+ * closed-source SDK call; rejects clearly instead of silently doing the
+ * wrong thing.
+ */
+RCT_EXPORT_METHOD(sortHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  if (rejecter) {
+    rejecter(@"not_implemented", @"sortHome is not implemented on iOS", nil);
+  }
+}
+
+/**
  查询房屋的列表
  */
-RCT_EXPORT_METHOD(queryRoomList:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(queryRoomList:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.currentHome = [self smartHomeWithParams:params];
 
@@ -200,10 +212,21 @@ RCT_EXPORT_METHOD(queryRoomList:(NSDictionary *)params resolver:(RCTPromiseResol
 }
 
 /**
+ * createGroup was never implemented on iOS, even in the pre-TurboModule
+ * bridge module. Rejects clearly rather than leaving the JS promise
+ * hanging or guessing at a closed-source SDK call.
+ */
+RCT_EXPORT_METHOD(createGroup:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  if (rejecter) {
+    rejecter(@"not_implemented", @"createGroup is not implemented on iOS", nil);
+  }
+}
+
+/**
  注册 Home信息监听
 
  */
-RCT_EXPORT_METHOD(registerHomeStatusListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(registerHomeStatusListener:(NSDictionary *)params) {
 
   NSNumber *homeIdNum = params[kTuyaRNHomeModuleHomeId];
   if (!homeIdNum || homeIdNum.longLongValue <= 0) {
@@ -216,18 +239,17 @@ RCT_EXPORT_METHOD(registerHomeStatusListener:(NSDictionary *)params resolver:(RC
  取消Home注册监听
 
  */
-RCT_EXPORT_METHOD(unRegisterHomeStatusListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(unRegisterHomeStatusListener:(NSDictionary *)params) {
   [[TuyaRNHomeListener shareInstance] removeHomeStatusSmartHome];
 }
 
-
 //
-RCT_EXPORT_METHOD(queryDeviceListToAddGroup:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(queryDeviceListToAddGroup:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
 
 }
 
-RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params) {
 
 }
 
@@ -240,5 +262,14 @@ RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params resolver:(RCTPromiseResolveBl
   self.currentHome = [ThingSmartHome homeWithHomeId:homeId];
   return self.currentHome;
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaHomeModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

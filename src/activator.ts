@@ -42,11 +42,34 @@ export function stopConfig() {
   return tuya.stopConfig();
 }
 
+export function onDestory() {
+  return tuya.onDestory();
+}
+
+export interface GwSubDevActivatorParams {
+  devId: string;
+  time: number;
+}
+
+export function newGwSubDevActivator(
+  params: GwSubDevActivatorParams
+): Promise<DeviceBean> {
+  return tuya.newGwSubDevActivator(params);
+}
+
+export function stopNewGwSubDevActivatorConfig(devId: string) {
+  return tuya.stopNewGwSubDevActivatorConfig({ devId });
+}
+
 export function startBluetoothScan() {
   if (Platform.OS === 'ios') {
     return tuyaBLEScanner.startBluetoothScan();
   }
   return tuya.startBluetoothScan();
+}
+
+export function stopBluetoothScan() {
+  return tuya.stopBluetoothScan();
 }
 
 export function initBluetoothDualModeActivator(

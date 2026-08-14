@@ -74,6 +74,26 @@ export function renameDevice(params: RenameDeviceParams): Promise<string> {
   return tuya.renameDevice(params);
 }
 
+export type GetDeviceDataParams = { devId: string };
+
+export function getDeviceData(
+  params: GetDeviceDataParams
+): Promise<DeviceBean> {
+  return tuya.getDeviceData(params);
+}
+
+export type OnDestroyParams = { devId: string };
+
+export function onDestroy(params: OnDestroyParams) {
+  tuya.onDestroy(params);
+}
+
+export type GetDpParams = { devId: string; dpId: string };
+
+export function getDp(params: GetDpParams): Promise<DeviceDpValue> {
+  return tuya.getDp(params);
+}
+
 export type GetDataPointStatsParams = {
   devId: string;
   DataPointTypeEnum: 'DAY' | 'WEEK' | 'MONTH';

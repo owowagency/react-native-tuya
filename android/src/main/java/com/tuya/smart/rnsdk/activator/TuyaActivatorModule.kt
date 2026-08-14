@@ -3,6 +3,7 @@ package com.tuya.smart.rnsdk.activator
 import android.content.Intent
 import android.provider.Settings
 import com.facebook.react.bridge.*
+import com.facebook.react.module.annotations.ReactModule
 import com.thingclips.smart.android.ble.api.ScanType
 import com.thingclips.smart.android.common.utils.WiFiUtil
 import com.thingclips.smart.home.sdk.ThingHomeSdk
@@ -15,37 +16,39 @@ import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
 import com.thingclips.smart.sdk.bean.DeviceBean
 import com.thingclips.smart.sdk.bean.MultiModeActivatorBean
 import com.thingclips.smart.sdk.enums.ActivatorModelEnum
+import com.tuya.smart.rnsdk.NativeTuyaActivatorModuleSpec
 import com.tuya.smart.rnsdk.utils.*
+import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.HOMEID
 import com.tuya.smart.rnsdk.utils.Constant.PASSWORD
 import com.tuya.smart.rnsdk.utils.Constant.SSID
 import com.tuya.smart.rnsdk.utils.Constant.TIME
-import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.TYPE
 
+@ReactModule(name = TuyaActivatorModule.NAME)
+class TuyaActivatorModule(reactContext: ReactApplicationContext) : NativeTuyaActivatorModuleSpec(reactContext) {
 
-class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+  companion object {
+    const val NAME = "TuyaActivatorModule"
+  }
 
   var mITuyaActivator: IThingActivator? = null
   var mTuyaGWActivator: IThingActivator? = null
+
   override fun getName(): String {
-    return "TuyaActivatorModule"
+    return NAME
   }
 
-  @ReactMethod
-  fun startBluetoothScan(promise: Promise) {
+  override fun startBluetoothScan(promise: Promise) {
     ThingHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
     ) { bean -> promise.resolve(TuyaReactUtils.parseToWritableMap(bean)) };
   }
 
-  @ReactMethod
-  fun stopBluetoothScan() {
+  override fun stopBluetoothScan() {
     ThingHomeSdk.getBleOperator().stopLeScan();
   }
 
-
-  @ReactMethod
-  fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
+  override fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD), params)) {
 
       ThingHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
@@ -90,15 +93,12 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
     }
   }
 
-
-  @ReactMethod
-  fun getCurrentWifi(params: ReadableMap, successCallback: Callback,
+  override fun getCurrentWifi(params: ReadableMap, successCallback: Callback,
                      errorCallback: Callback) {
     successCallback.invoke(WiFiUtil.getCurrentSSID(reactApplicationContext.applicationContext));
   }
 
-  @ReactMethod
-  fun openNetworkSettings(params: ReadableMap) {
+  override fun openNetworkSettings(params: ReadableMap) {
     val currentActivity = currentActivity
     if (currentActivity == null) {
       return
@@ -124,8 +124,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
     }
   }
 
-  @ReactMethod
-  fun initActivator(params: ReadableMap, promise: Promise) {
+  override fun initActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD, TIME, TYPE), params)) {
       ThingHomeSdk.getActivatorInstance().getActivatorToken(params.getDouble(HOMEID).toLong(), object : IThingActivatorGetToken {
         override fun onSuccess(token: String) {
@@ -154,8 +153,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
   /**
    * ZigBee子设备配网需要ZigBee网关设备云在线的情况下才能发起,且子设备处于配网状态。
    */
-  @ReactMethod
-  fun newGwSubDevActivator(params: ReadableMap, promise: Promise) {
+  override fun newGwSubDevActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(DEVID, TIME), params)) {
       val builder = ThingGwSubDevActivatorBuilder()
         //设置网关ID
@@ -187,14 +185,20 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
     }
   }
 
-  @ReactMethod
-  fun stopConfig() {
+  // iOS-only in practice: there's no Android equivalent - the gateway
+  // sub-device activator started via newGwSubDevActivator is stopped
+  // through the shared stopConfig() instead. Stubbed here only because the
+  // shared TurboModule spec requires every method to be implemented on both
+  // platforms.
+  override fun stopNewGwSubDevActivatorConfig(params: ReadableMap) {
+  }
+
+  override fun stopConfig() {
     mITuyaActivator?.stop()
     mTuyaGWActivator?.stop()
   }
 
-  @ReactMethod
-  fun onDestory() {
+  override fun onDestory() {
     mITuyaActivator?.onDestroy()
     mTuyaGWActivator?.onDestroy()
   }

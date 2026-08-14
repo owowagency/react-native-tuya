@@ -28,10 +28,20 @@
 
 RCT_EXPORT_MODULE(TuyaDeviceModule)
 
+// Pre-existing limitation: iOS has no comparable API to look up a device by
+// id the way Android's getDevice does (see src/api/device.ts's own TODO
+// comment). Stubbed here so this at least fails cleanly instead of
+// throwing "tuya.getDevice is not a function".
+RCT_EXPORT_METHOD(getDevice:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  if (rejecter) {
+    rejecter(@"TuyaDeviceModule.getDevice", @"getDevice is not implemented on iOS", nil);
+  }
+}
+
 /**
  设备监听开启
  */
-RCT_EXPORT_METHOD(registerDevListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(registerDevListener:(NSDictionary *)params) {
 
   self.smartDevice  = [self smartDeviceWithParams:params];
   //监听设备
@@ -42,7 +52,7 @@ RCT_EXPORT_METHOD(registerDevListener:(NSDictionary *)params resolver:(RCTPromis
  设备监听删除
 
  */
-RCT_EXPORT_METHOD(unRegisterDevListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(unRegisterDevListener:(NSDictionary *)params) {
   NSString *deviceId = params[kTuyaDeviceModuleDevId];
   if(deviceId.length == 0) {
     return;
@@ -59,25 +69,10 @@ RCT_EXPORT_METHOD(unRegisterDevListener:(NSDictionary *)params resolver:(RCTProm
 }
 
 
-/*
- * 通过局域网或者云端这两种方式发送控制指令给设备。send(通过局域网或者云端这两种方式发送控制指令给设备。)
- command的格式应符合{key:value} 例如 {"1":true}
- */
-RCT_EXPORT_METHOD(send:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  //设备发送消息
-  self.smartDevice  = [self smartDeviceWithParams:params];
-  NSDictionary *command = params[kTuyaDeviceModuleCommand];
-  [self.smartDevice publishDps:command success:^{
-    [TuyaRNUtils resolverWithHandler:resolver];
-  } failure:^(NSError *error) {
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-  }];
-}
-
 /**
  查询单个dp数据
  */
-RCT_EXPORT_METHOD(getDp:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getDp:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *dpId = params[kTuyaDeviceModuleDpId];
   //读取dp点
@@ -89,11 +84,25 @@ RCT_EXPORT_METHOD(getDp:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)
   }
 }
 
+/*
+ * 通过局域网或者云端这两种方式发送控制指令给设备。send(通过局域网或者云端这两种方式发送控制指令给设备。)
+ command的格式应符合{key:value} 例如 {"1":true}
+ */
+RCT_EXPORT_METHOD(send:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  //设备发送消息
+  self.smartDevice  = [self smartDeviceWithParams:params];
+  NSDictionary *command = params[kTuyaDeviceModuleCommand];
+  [self.smartDevice publishDps:command success:^{
+    [TuyaRNUtils resolverWithHandler:resolver];
+  } failure:^(NSError *error) {
+    [TuyaRNUtils rejecterWithError:error handler:rejecter];
+  }];
+}
 
 /**
  设备重命名
  */
-RCT_EXPORT_METHOD(renameDevice:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(renameDevice:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.smartDevice  = [self smartDeviceWithParams:params];
   NSString *deviceName = params[kTuyaDeviceModuleDeviceName];
@@ -104,28 +113,14 @@ RCT_EXPORT_METHOD(renameDevice:(NSDictionary *)params resolver:(RCTPromiseResolv
   }];
 }
 
-// 更新单个设备信息:
-//RCT_EXPORT_METHOD(getDp:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-//    TuyaSmartDevice *device = [TuyaSmartDevice deviceWithDeviceId:params[@"devId"]];
-//    [device syncWithCloud:^{
-//      if (resolver) {
-//        resolver(@"syncWithCloud success");
-//      }
-//    } failure:^(NSError *error) {
-//        [TuyaRNUtils rejecterWithError:error handler:rejecter];
-//    }];
-//}
-
-
-RCT_EXPORT_METHOD(getDataPointStat:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getDataPointStat:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   self.smartDevice  = [self smartDeviceWithParams:params];
 }
-
 
 /**
  删除设备
  */
-RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   self.smartDevice  = [self smartDeviceWithParams:params];
   [self.smartDevice remove:^{
@@ -135,38 +130,20 @@ RCT_EXPORT_METHOD(removeDevice:(NSDictionary *)params resolver:(RCTPromiseResolv
   }];
 }
 
-// 设备重命名：已验证
-//RCT_EXPORT_METHOD(renameDevice:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-//
-//    TuyaSmartDevice *device = [TuyaSmartDevice deviceWithDeviceId:params[@"devId"]];
-//    [device updateName:params[@"name"] success:^{
-//      if (resolver) {
-//        resolver(@"rename success");
-//      }
-//    } failure:^(NSError *error) {
-//        [TuyaRNUtils rejecterWithError:error handler:rejecter];
-//    }];
-//}
-
-
-RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(onDestroy:(NSDictionary *)params) {
 
 }
 
 // 下发升级指令：
-RCT_EXPORT_METHOD(startOta:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(startOta:(NSDictionary *)params) {
     ThingSmartDevice *device = [ThingSmartDevice deviceWithDeviceId:params[@"devId"]];
     [device upgradeFirmware:[params[@"type"] integerValue] success:^{
-        if (resolver) {
-          resolver(@"success");
-        }
     } failure:^(NSError *error) {
-        [TuyaRNUtils rejecterWithError:error handler:rejecter];
     }];
 }
 
 // 查询固件升级信息：
-RCT_EXPORT_METHOD(getOtaInfo:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getOtaInfo:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
     ThingSmartDevice *device = [ThingSmartDevice deviceWithDeviceId:params[@"devId"]];
     [device getFirmwareUpgradeInfo:^(NSArray<ThingSmartFirmwareUpgradeModel *> *upgradeModelList) {
@@ -197,5 +174,13 @@ RCT_EXPORT_METHOD(getOtaInfo:(NSDictionary *)params resolver:(RCTPromiseResolveB
   return [ThingSmartDevice deviceWithDeviceId:deviceId];
 }
 
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaDeviceModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

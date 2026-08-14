@@ -10,6 +10,8 @@
 #import <ThingSmartActivatorKit/ThingSmartActivatorKit.h>
 #import <ThingSmartBaseKit/ThingSmartBaseKit.h>
 #import <ThingSmartDeviceKit/ThingSmartDeviceKit.h>
+#import <ThingBluetooth/ThingBluetooth.h>
+#import <ThingSmartBLECoreKit/ThingSmartBLECoreKit.h>
 #import <ThingSmartBLEKit/ThingSmartBLEManager+Biz.h>
 #import "TuyaRNUtils+Network.h"
 #import "YYModel.h"
@@ -28,7 +30,7 @@ static TuyaBLERNScannerModule * scannerInstance = nil;
 
 RCT_EXPORT_MODULE(TuyaBLEScannerModule)
 
-RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   if (scannerInstance == nil) {
     scannerInstance = [TuyaBLERNScannerModule new];
   }
@@ -41,9 +43,23 @@ RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver rejecter:(
 }
 
 - (void)didDiscoveryDeviceWithDeviceInfo:(ThingBLEAdvModel *)deviceInfo {
+  // This delegate callback fires once per discovered device, but promiseResolveBlock
+  // is a one-shot Promise resolver - invoking it more than once crashes under the
+  // New Architecture's TurboModule promise handling. Clear it after first use.
   if (scannerInstance.promiseResolveBlock) {
-    self.promiseResolveBlock([deviceInfo yy_modelToJSONObject]);
+    RCTPromiseResolveBlock resolve = scannerInstance.promiseResolveBlock;
+    scannerInstance.promiseResolveBlock = nil;
+    resolve([deviceInfo yy_modelToJSONObject]);
   }
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaBLEScannerModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

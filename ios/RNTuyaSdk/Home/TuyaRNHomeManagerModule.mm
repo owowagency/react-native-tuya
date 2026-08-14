@@ -9,7 +9,6 @@
 #import "TuyaRNHomeManagerModule.h"
 #import <ThingSmartDeviceKit/ThingSmartHome.h>
 #import <ThingSmartDeviceKit/ThingSmartHomeManager.h>
-#import <ThingSmartBaseKit/ThingSmartRequest.h>
 #import "YYModel.h"
 #import "TuyaRNUtils.h"
 #import "TuyaRNHomeManagerListener.h"
@@ -27,7 +26,6 @@
 @interface TuyaRNHomeManagerModule()
 
 @property (nonatomic, strong) ThingSmartHomeManager *homeManager;
-@property (nonatomic, strong) ThingSmartRequest *request;
 
 @end
 
@@ -40,17 +38,17 @@ RCT_EXPORT_MODULE(TuyaHomeManagerModule)
  *
  * @param listener
  */
-RCT_EXPORT_METHOD(queryHomeList:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(queryHomeList:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   [self.homeManager getHomeListWithSuccess:^(NSArray<ThingSmartHomeModel *> *homes) {
-    
+
     if (homes.count == 0) {
       if (resolver) {
         resolver(@[]);
       }
       return;
     }
-    
+
     NSMutableArray *list = [NSMutableArray array];
     for (ThingSmartHomeModel *homeModel in homes) {
       NSDictionary *dic = [homeModel yy_modelToJSONObject];
@@ -58,12 +56,12 @@ RCT_EXPORT_METHOD(queryHomeList:(RCTPromiseResolveBlock)resolver rejecter:(RCTPr
       [homeDic setObject:[NSNumber numberWithLongLong:homeModel.homeId] forKey:@"homeId"];
       [list addObject:homeDic];
     }
-    
+
     if (resolver) {
       resolver(list);
     }
   } failure:^(NSError *error) {
-    
+
   }];
 }
 
@@ -76,18 +74,30 @@ RCT_EXPORT_METHOD(queryHomeList:(RCTPromiseResolveBlock)resolver rejecter:(RCTPr
  * @param rooms    房间列表
  * @param callback
  */
-RCT_EXPORT_METHOD(createHome:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  
+RCT_EXPORT_METHOD(createHome:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+
   NSString *name = params[kTuyaHomeManagerModuleName];
   NSString *geoName = params[kTuyaHomeManagerModuleGeoName];
   NSNumber *lat = params[kTuyaHomeManagerModuleLat];
   NSNumber *lon = params[kTuyaHomeManagerModuleLon];
   NSArray *rooms = params[kTuyaHomeManagerModuleRooms];
-  
+
   double latValue = lat.doubleValue;
   double lonValue = lon.doubleValue;
-  
+
   [self.homeManager addHomeWithName:name geoName:geoName rooms:rooms latitude:latValue longitude:lonValue success:^(long long result) {
+    [TuyaRNUtils resolverWithHandler:resolver];
+  } failure:^(NSError *error) {
+    [TuyaRNUtils rejecterWithError:error handler:rejecter];
+  }];
+}
+
+RCT_EXPORT_METHOD(joinFamily:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
+  NSNumber *homeIdNum = params[kTuyaHomeManagerModuleHomeId];
+  NSString *action = params[kTuyaHomeManagerModuleAction];
+  ThingSmartHome *newHome = [ThingSmartHome homeWithHomeId:homeIdNum.longLongValue];
+
+  [newHome joinFamilyWithAccept:action.boolValue success:^(BOOL result) {
     [TuyaRNUtils resolverWithHandler:resolver];
   } failure:^(NSError *error) {
     [TuyaRNUtils rejecterWithError:error handler:rejecter];
@@ -100,8 +110,8 @@ RCT_EXPORT_METHOD(createHome:(NSDictionary *)params resolver:(RCTPromiseResolveB
  *
  * @param listener
  */
-RCT_EXPORT_METHOD(registerTuyaHomeChangeListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  
+RCT_EXPORT_METHOD(registerTuyaHomeChangeListener:(NSDictionary *)params) {
+
   NSNumber *homeIdNum = params[kTuyaHomeManagerModuleHomeId];
   if (!homeIdNum || homeIdNum.longLongValue <= 0) {
     return;
@@ -116,28 +126,15 @@ RCT_EXPORT_METHOD(registerTuyaHomeChangeListener:(NSDictionary *)params resolver
  *
  * @param listener
  */
-RCT_EXPORT_METHOD(unregisterTuyaHomeChangeListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  
+RCT_EXPORT_METHOD(unregisterTuyaHomeChangeListener:(NSDictionary *)params) {
+
   //结束家庭的监听情况
   [[TuyaRNHomeManagerListener sharedInstance] removeSmartHomeManager];
   [[TuyaRNHomeListener shareInstance] removeHomeChangeSmartHome];
-  
-}
-
-RCT_EXPORT_METHOD(joinFamily:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  NSNumber *homeIdNum = params[kTuyaHomeManagerModuleHomeId];
-  NSString *action = params[kTuyaHomeManagerModuleAction];
-  ThingSmartHome *newHome = [ThingSmartHome homeWithHomeId:homeIdNum.longLongValue];
-
-  [newHome joinFamilyWithAccept:action.boolValue success:^(BOOL result) {
-    [TuyaRNUtils resolverWithHandler:resolver];
-  } failure:^(NSError *error) {
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-  }];
 }
 
 RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
-  
+
 }
 
 #pragma mark -
@@ -149,11 +146,13 @@ RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
   return _homeManager;
 }
 
-- (ThingSmartRequest *)request {
-  if (!_request) {
-    _request = [ThingSmartRequest new];
-  }
-  return _request;
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaHomeManagerModuleSpecJSI>(params);
 }
+
+#endif
 
 @end

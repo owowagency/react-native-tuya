@@ -2,27 +2,21 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
-
-buildscript {
-    ext.kotlin_version = '1.7.20'
-    repositories {
-        jcenter()
-        google()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+def isNewArchitectureEnabled() {
+    // New Architecture has been mandatory (and non-optional) since React Native 0.82.
+    return true
 }
 
+if (isNewArchitectureEnabled()) {
+    apply plugin: "com.facebook.react"
+}
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 25
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -35,6 +29,14 @@ android {
 
     packagingOptions {
         pickFirst 'lib/*/libc++_shared.so'
+    }
+
+    sourceSets.main {
+        java {
+            if (!isNewArchitectureEnabled()) {
+                srcDirs += 'src/paper/java'
+            }
+        }
     }
 
     buildTypes {
@@ -57,10 +59,9 @@ configurations.all {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.alibaba:fastjson:1.1.67.android'
-    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.6.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.14.9'
     implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0'
-    implementation 'com.thingclips.smart:thingsmart:5.11.3'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.thingclips.smart:thingsmart:7.5.1'
     implementation 'com.facebook.react:react-native:+'
     implementation 'de.greenrobot:eventbus:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -78,19 +79,4 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://developer.huawei.com/repo/' }
     maven { url 'https://jitpack.io' }
-}
-
-allprojects {
-  repositories {
-    exclusiveContent {
-      filter {
-        includeGroup "com.facebook.react"
-      }
-      forRepository {
-        maven {
-          url "$rootDir/../node_modules/react-native/android"
-        }
-      }
-    }
-  }
 }

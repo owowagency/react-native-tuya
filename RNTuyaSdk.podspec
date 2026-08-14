@@ -13,8 +13,12 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "12.0" }
 
   s.source       = { :git => "https://github.com/owowagency/react-native-tuya.git", :tag => "v#{s.version}" }
-  s.source_files  = "ios/**/*.{h,m}"
+  s.source_files  = "ios/**/*.{h,m,mm}"
 
   s.dependency 'React'
-  s.dependency 'ThingSmartHomeKit', '~> 5.8.0'
+  s.dependency 'ThingSmartHomeKit', '7.8.0.3'
+
+  # New Architecture has been mandatory (and non-optional) since React Native
+  # 0.82, so this is no longer conditional on RCT_NEW_ARCH_ENABLED.
+  install_modules_dependencies(s)
 end

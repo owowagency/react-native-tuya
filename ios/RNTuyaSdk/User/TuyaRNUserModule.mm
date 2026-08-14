@@ -8,7 +8,6 @@
 
 #import "TuyaRNUserModule.h"
 #import <ThingSmartBaseKit/ThingSmartBaseKit.h>
-#import <React/RCTBridgeModule.h>
 #import "TuyaRNUtils.h"
 #import "YYModel.h"
 
@@ -22,7 +21,6 @@
 #define kTuyaRNUserModuleEmail @"email"
 #define kTuyaRNUserModuleUid @"uid"
 
-
 #define kTuyaRNUserModuleTwitterKey @"key"
 #define kTuyaRNUserModuleTwitterSecret @"secret"
 #define kTuyaRNUserModuleQQUserId @"userId"
@@ -33,21 +31,20 @@
 #define kTuyaRNUserModuleImageFile @"file"
 #define kTuyaRNUserModuleUnit @"unit"
 
-
 @implementation TuyaRNUserModule
 
 RCT_EXPORT_MODULE(TuyaUserModule)
 
-//版本检测
-RCT_EXPORT_METHOD(checkVersionUpgrade:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+/* 版本检测 */
+RCT_EXPORT_METHOD(checkVersionUpgrade:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
-  if(resolver) {
+  if (resolver) {
     resolver([NSNumber numberWithBool:[[ThingSmartSDK sharedInstance] checkVersionUpgrade]]);
   }
 }
 
-//版本升级
-RCT_EXPORT_METHOD(upgradeVersion:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+/* 版本升级 */
+RCT_EXPORT_METHOD(upgradeVersion:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   [[ThingSmartSDK sharedInstance] upgradeVersion:^{
     [TuyaRNUtils resolverWithHandler:resolver];
@@ -62,7 +59,7 @@ RCT_EXPORT_METHOD(upgradeVersion:(NSDictionary *)params resolver:(RCTPromiseReso
 * @param phoneNumber   手机号码
 * @param validateType  验证码类型
 */
-RCT_EXPORT_METHOD(getValidateCode:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getValidateCode:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *phoneNumber = params[kTuyaRNUserModulePhoneNumber];
@@ -86,7 +83,7 @@ RCT_EXPORT_METHOD(getValidateCode:(NSDictionary *)params resolver:(RCTPromiseRes
 * @param phone       电话
 * @param code        验证码
 */
-RCT_EXPORT_METHOD(loginWithValidateCode:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginWithValidateCode:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *phoneNumber = params[kTuyaRNUserModulePhoneNumber];
@@ -110,7 +107,7 @@ RCT_EXPORT_METHOD(loginWithValidateCode:(NSDictionary *)params resolver:(RCTProm
 * @param phone       手机密码
 * @param passwd      登陆密码
 */
-RCT_EXPORT_METHOD(registerAccountWithPhone:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(registerAccountWithPhone:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *phoneNumber = params[kTuyaRNUserModulePhoneNumber];
@@ -139,7 +136,7 @@ RCT_EXPORT_METHOD(registerAccountWithPhone:(NSDictionary *)params resolver:(RCTP
 * @param phone       手机密码
 * @param passwd      登陆密码
  */
-RCT_EXPORT_METHOD(loginWithPhonePassword:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginWithPhonePassword:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *phoneNumber = params[kTuyaRNUserModulePhoneNumber];
@@ -163,7 +160,7 @@ RCT_EXPORT_METHOD(loginWithPhonePassword:(NSDictionary *)params resolver:(RCTPro
 * @param code        手机验证码
 * @param newPasswd   新密码
 */
-RCT_EXPORT_METHOD(resetPhonePassword:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(resetPhonePassword:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *phoneNumber = params[kTuyaRNUserModulePhoneNumber];
@@ -186,7 +183,7 @@ RCT_EXPORT_METHOD(resetPhonePassword:(NSDictionary *)params resolver:(RCTPromise
 * @param email  邮箱账户
 * @param countryCode 国家区号
 */
-RCT_EXPORT_METHOD(getRegisterEmailValidateCode:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getRegisterEmailValidateCode:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -204,7 +201,7 @@ RCT_EXPORT_METHOD(getRegisterEmailValidateCode:(NSDictionary *)params resolver:(
 * @param email       邮箱账户
 * @param passwd      登陆密码
 */
-RCT_EXPORT_METHOD(registerAccountWithEmail:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(registerAccountWithEmail:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -224,7 +221,7 @@ RCT_EXPORT_METHOD(registerAccountWithEmail:(NSDictionary *)params resolver:(RCTP
 * @param email  邮箱账户
 * @param passwd 登陆密码
 */
-RCT_EXPORT_METHOD(loginWithEmail:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginWithEmail:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -243,7 +240,7 @@ RCT_EXPORT_METHOD(loginWithEmail:(NSDictionary *)params resolver:(RCTPromiseReso
 * @param countryCode 国家区号
 * @param email       邮箱账户
 */
-RCT_EXPORT_METHOD(getEmailValidateCode:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getEmailValidateCode:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -261,7 +258,7 @@ RCT_EXPORT_METHOD(getEmailValidateCode:(NSDictionary *)params resolver:(RCTPromi
 * @param validateCode 邮箱验证码
 * @param passwd    新密码
 */
-RCT_EXPORT_METHOD(resetEmailPassword:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(resetEmailPassword:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *email = params[kTuyaRNUserModuleEmail];
@@ -275,7 +272,7 @@ RCT_EXPORT_METHOD(resetEmailPassword:(NSDictionary *)params resolver:(RCTPromise
   }];
 }
 
-RCT_EXPORT_METHOD(logout:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(logout:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   [[ThingSmartUser sharedInstance] loginOut:^{
     [TuyaRNUtils resolverWithHandler:resolver];
@@ -284,7 +281,7 @@ RCT_EXPORT_METHOD(logout:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRe
   }];
 }
 
-RCT_EXPORT_METHOD(cancelAccount:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(cancelAccount:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   [[ThingSmartUser sharedInstance] cancelAccount:^{
     [TuyaRNUtils resolverWithHandler:resolver];
@@ -299,7 +296,7 @@ RCT_EXPORT_METHOD(cancelAccount:(RCTPromiseResolveBlock)resolver rejecter:(RCTPr
 * @param uid         用户uid
 * @param password    用户密码
 */
-RCT_EXPORT_METHOD(registerAccountWithUid:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(registerAccountWithUid:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *uid = params[kTuyaRNUserModuleUid];
@@ -313,14 +310,12 @@ RCT_EXPORT_METHOD(registerAccountWithUid:(NSDictionary *)params resolver:(RCTPro
 
 }
 
-
 /* uid 登陆
 * @param countryCode 国家号码
 * @param uid         用户uid
 * @param passwd      用户密码
  */
-
-RCT_EXPORT_METHOD(loginWithUid:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginWithUid:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *uid = params[kTuyaRNUserModuleUid];
@@ -334,13 +329,12 @@ RCT_EXPORT_METHOD(loginWithUid:(NSDictionary *)params resolver:(RCTPromiseResolv
 
 }
 
-
 /* uid 登陆+注册
 * @param countryCode 国家号码
 * @param uid         用户uid
 * @param passwd      用户密码
 */
-RCT_EXPORT_METHOD(loginOrRegisterWithUid:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginOrRegisterWithUid:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *uid = params[kTuyaRNUserModuleUid];
@@ -358,7 +352,7 @@ RCT_EXPORT_METHOD(loginOrRegisterWithUid:(NSDictionary *)params resolver:(RCTPro
 * @param key         twitter授权登录获取的key
 * @param secret      twitter授权登录获取的secret
  */
-RCT_EXPORT_METHOD(loginByTwitter:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginByTwitter:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *key = params[kTuyaRNUserModuleTwitterKey];
@@ -376,7 +370,7 @@ RCT_EXPORT_METHOD(loginByTwitter:(NSDictionary *)params resolver:(RCTPromiseReso
 * @param userId          QQ授权登录获取的userId
 * @param accessToken      QQ授权登录获取的accessToken
 */
-RCT_EXPORT_METHOD(loginByQQ:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginByQQ:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *userId = params[kTuyaRNUserModuleQQUserId];
@@ -393,7 +387,7 @@ RCT_EXPORT_METHOD(loginByQQ:(NSDictionary *)params resolver:(RCTPromiseResolveBl
 * @param countryCode 国家区号
 * @param code        微信授权登录获取的code
 */
-RCT_EXPORT_METHOD(loginByWechat:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginByWechat:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *code = params[kTuyaRNUserModuleWechatkCode];
@@ -410,7 +404,7 @@ RCT_EXPORT_METHOD(loginByWechat:(NSDictionary *)params resolver:(RCTPromiseResol
 * @param countryCode 国家区号
 * @param code     token facebook授权登录获取的token
  */
-RCT_EXPORT_METHOD(loginByFacebook:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(loginByFacebook:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *countryCode = params[kTuyaRNUserModuleCountryCode];
   NSString *code = params[kTuyaRNUserModuleFacebookCode];
@@ -422,8 +416,7 @@ RCT_EXPORT_METHOD(loginByFacebook:(NSDictionary *)params resolver:(RCTPromiseRes
   }];
 }
 
-
-RCT_EXPORT_METHOD(getCurrentUser:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(getCurrentUser:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   ThingSmartUser *user = [ThingSmartUser sharedInstance];
   if (resolver) {
     NSDictionary *dic = [user yy_modelToJSONObject];
@@ -440,12 +433,11 @@ RCT_EXPORT_METHOD(getCurrentUser:(RCTPromiseResolveBlock)resolver rejecter:(RCTP
   }
 }
 
-
-RCT_EXPORT_METHOD(uploadUserAvatar:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(uploadUserAvatar:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   UIImage *image = params[kTuyaRNUserModuleImageFile];
 
-  if (image == nil || [image isKindOfClass:[UIImage class]]) {
+  if (image == nil || ![image isKindOfClass:[UIImage class]]) {
     [TuyaRNUtils rejecterWithError:[NSError thingsdk_errorWithCodeString:@"999" errorMsg:@"error image info"] handler:rejecter];
     return;
   }
@@ -457,7 +449,7 @@ RCT_EXPORT_METHOD(uploadUserAvatar:(NSDictionary *)params resolver:(RCTPromiseRe
   }];
 }
 
-RCT_EXPORT_METHOD(setTempUnit:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(setTempUnit:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
 
   NSString *unit = params[kTuyaRNUserModuleUnit];
   if (unit) {
@@ -470,11 +462,6 @@ RCT_EXPORT_METHOD(setTempUnit:(NSDictionary *)params resolver:(RCTPromiseResolve
   }
 }
 
-RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
-
-}
-
-
 #pragma mark -
 #pragma mark - api
 - (NSString *)getValidStr:(NSString *)str {
@@ -483,5 +470,14 @@ RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
   }
   return str;
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaUserModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

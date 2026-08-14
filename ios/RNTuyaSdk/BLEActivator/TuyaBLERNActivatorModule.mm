@@ -11,6 +11,8 @@
 #import <ThingSmartActivatorKit/ThingSmartActivatorKit.h>
 #import <ThingSmartBaseKit/ThingSmartBaseKit.h>
 #import <ThingSmartDeviceKit/ThingSmartDeviceKit.h>
+#import <ThingBluetooth/ThingBluetooth.h>
+#import <ThingSmartBLECoreKit/ThingSmartBLECoreKit.h>
 #import <ThingSmartBLEKit/ThingSmartBLEWifiActivator.h>
 #import "TuyaRNUtils+Network.h"
 #import "YYModel.h"
@@ -35,7 +37,7 @@ static TuyaBLERNActivatorModule * activatorInstance = nil;
 
 RCT_EXPORT_MODULE(TuyaBLEActivatorModule)
 
-RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolve:(RCTPromiseResolveBlock)resolver reject:(RCTPromiseRejectBlock)rejecter) {
   if (activatorInstance == nil) {
     activatorInstance = [TuyaBLERNActivatorModule new];
   }
@@ -55,24 +57,46 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
       // Wait for activation
     } failure:^ {
       if (activatorInstance.promiseRejectBlock) {
-        [TuyaRNUtils rejecterWithError:nil handler:rejecter];
+        RCTPromiseRejectBlock reject = activatorInstance.promiseRejectBlock;
+        activatorInstance.promiseResolveBlock = nil;
+        activatorInstance.promiseRejectBlock = nil;
+        [TuyaRNUtils rejecterWithError:nil handler:reject];
       }
       return;
     }];
 }
 
 - (void)bleWifiActivator:(ThingSmartBLEWifiActivator *)activator didReceiveBLEWifiConfigDevice:(ThingSmartDeviceModel *)deviceModel error:(NSError *)error {
+  // These callbacks can fire more than once (e.g. an error after a prior success/error),
+  // but the resolve/reject blocks are one-shot Promise callbacks - invoking one more than
+  // once crashes under the New Architecture's TurboModule promise handling. Clear both
+  // after first use.
   if (!error && deviceModel) {
     if (activatorInstance.promiseResolveBlock) {
-      self.promiseResolveBlock([deviceModel yy_modelToJSONObject]);
+      RCTPromiseResolveBlock resolve = activatorInstance.promiseResolveBlock;
+      activatorInstance.promiseResolveBlock = nil;
+      activatorInstance.promiseRejectBlock = nil;
+      resolve([deviceModel yy_modelToJSONObject]);
     }
   }
   if (error) {
     if (activatorInstance.promiseRejectBlock) {
-      [TuyaRNUtils rejecterWithError:error handler:activatorInstance.promiseRejectBlock];
+      RCTPromiseRejectBlock reject = activatorInstance.promiseRejectBlock;
+      activatorInstance.promiseResolveBlock = nil;
+      activatorInstance.promiseRejectBlock = nil;
+      [TuyaRNUtils rejecterWithError:error handler:reject];
     }
   }
 
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaBLEActivatorModuleSpecJSI>(params);
+}
+
+#endif
 
 @end

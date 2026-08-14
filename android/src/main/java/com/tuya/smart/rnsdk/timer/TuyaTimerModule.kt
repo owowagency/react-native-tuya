@@ -1,6 +1,7 @@
 package com.tuya.smart.rnsdk.timer
 
 import com.facebook.react.bridge.*
+import com.facebook.react.module.annotations.ReactModule
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.sdk.api.IGetAllTimerWithDevIdCallback
 import com.thingclips.smart.sdk.api.IGetDeviceTimerStatusCallback
@@ -8,6 +9,7 @@ import com.thingclips.smart.sdk.api.IGetTimerWithTaskCallback
 import com.thingclips.smart.sdk.api.IResultStatusCallback
 import com.thingclips.smart.sdk.bean.TimerTask
 import com.thingclips.smart.sdk.bean.TimerTaskStatus
+import com.tuya.smart.rnsdk.NativeTuyaTimerModuleSpec
 import com.tuya.smart.rnsdk.utils.Constant
 import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.DPS
@@ -22,11 +24,23 @@ import com.tuya.smart.rnsdk.utils.ReactParamsCheck
 import com.tuya.smart.rnsdk.utils.TuyaReactUtils
 import java.util.ArrayList
 
+@ReactModule(name = TuyaTimerModule.NAME)
+class TuyaTimerModule(reactContext: ReactApplicationContext) : NativeTuyaTimerModuleSpec(reactContext) {
 
-class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+    companion object {
+        const val NAME = "TuyaTimerModule"
+    }
 
     override fun getName(): String {
-        return "TuyaTimerModule"
+        return NAME
+    }
+
+    // No-ops on Android too - these only ever had empty bodies on iOS, kept
+    // for TurboModule spec parity across platforms.
+    override fun initWithOptions(params: ReadableMap) {
+    }
+
+    override fun onDestory(params: ReadableMap) {
     }
 
     /**
@@ -38,8 +52,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
      *  @param time         定时任务下的定时钟
      *  @param callback     回调
      */
-    @ReactMethod
-    fun addTimerWithTask(params: ReadableMap,promise: Promise) {
+    override fun addTimerWithTask(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(TASKNAME, LOOPS,DEVID, DPS, TIME), params)) {
             ThingHomeSdk.getTimerManagerInstance().addTimerWithTask(
                     params.getString(TASKNAME),
@@ -53,8 +66,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     /*获取某设备下的所有定时任务状态*/
-    @ReactMethod
-    fun getTimerTaskStatusWithDeviceId(params: ReadableMap,promise: Promise) {
+    override fun getTimerTaskStatusWithDeviceId(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             ThingHomeSdk.getTimerManagerInstance().getTimerTaskStatusWithDeviceId(
                     params.getString(DEVID),
@@ -64,8 +76,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     /*控制定时任务中所有定时器的开关状态*/
-    @ReactMethod
-    fun updateTimerTaskStatusWithTask(params: ReadableMap,promise: Promise) {
+    override fun updateTimerTaskStatusWithTask(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(TASKNAME,DEVID,STATUS), params)) {
             ThingHomeSdk.getTimerManagerInstance().updateTimerTaskStatusWithTask(
                     params.getString(TASKNAME),
@@ -77,8 +88,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     /*控制某个定时器的开关状态*/
-    @ReactMethod
-    fun updateTimerStatusWithTask(params: ReadableMap,promise: Promise) {
+    override fun updateTimerStatusWithTask(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(TASKNAME,DEVID,TIMERID, ISOPEN), params)) {
             ThingHomeSdk.getTimerManagerInstance().updateTimerStatusWithTask(
                     params.getString(TASKNAME),
@@ -92,8 +102,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
 
     /*删除定时器*/
-    @ReactMethod
-    fun removeTimerWithTask(params: ReadableMap,promise: Promise) {
+    override fun removeTimerWithTask(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(TASKNAME,DEVID, TIMERID), params)) {
             ThingHomeSdk.getTimerManagerInstance().removeTimerWithTask(
                     params.getString(TASKNAME),
@@ -114,8 +123,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
      * @param isOpen	  是否开启
      * @param callback 回调
      */
-    @ReactMethod
-    fun updateTimerWithTask(params: ReadableMap,promise: Promise) {
+    override fun updateTimerWithTask(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(TASKNAME, LOOPS, DEVID, TIMERID, TIME, ISOPEN), params)) {
             ThingHomeSdk.getTimerManagerInstance().updateTimerWithTask(
                     params.getString(TASKNAME),
@@ -131,8 +139,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     /*获取定时任务下所有定时器*/
-    @ReactMethod
-    fun getTimerWithTask(params: ReadableMap,promise: Promise) {
+    override fun getTimerWithTask(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(TASKNAME, DEVID), params)) {
             ThingHomeSdk.getTimerManagerInstance().getTimerWithTask(
                     params.getString(TASKNAME),
@@ -142,8 +149,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     /*获取设备所有定时任务下所有定时器*/
-    @ReactMethod
-    fun getAllTimerWithDeviceId(params: ReadableMap,promise: Promise) {
+    override fun getAllTimerWithDeviceId(params: ReadableMap,promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             ThingHomeSdk.getTimerManagerInstance().getAllTimerWithDeviceId(
                     params.getString(DEVID),
@@ -162,6 +168,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             }
         }
     }
+
     fun getIGetTimerWithTaskCallback(promise: Promise): IGetTimerWithTaskCallback {
         return object : IGetTimerWithTaskCallback {
             override fun onSuccess(p0: TimerTask?) {
@@ -173,6 +180,7 @@ class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             }
         }
     }
+
     fun getIGetDeviceTimerStatusCallback(promise: Promise): IGetDeviceTimerStatusCallback {
         return object : IGetDeviceTimerStatusCallback {
             override fun onSuccess(p0: ArrayList<TimerTaskStatus>?) {

@@ -27,22 +27,21 @@
 
 @end
 
-
 @implementation TuyaRNCoreModule
 
 RCT_EXPORT_MODULE(TuyaCoreModule)
 
 RCT_EXPORT_METHOD(initWithOptions:(NSDictionary *)params) {
-  
+
   NSString *appKey = params[kTuyaCoreModuleAppkey];
   NSString *appSecret = params[kTuyaCoreModuleAppSecret];
-  
+
   dispatch_async(dispatch_get_main_queue(), ^{
 //    [[TuyaSmartSDK sharedInstance] startWithAppKey:appKey secretKey:appSecret];
 //#ifdef DEBUG
 //    [TuyaSmartSDK sharedInstance].debugMode = YES;
 //#endif
-    
+
     if (!self.locationManager) {
       self.locationManager = [CLLocationManager new];
       self.locationManager.delegate = self;
@@ -57,18 +56,64 @@ RCT_EXPORT_METHOD(initWithOptions:(NSDictionary *)params) {
   });
 }
 
+//判断网络
+RCT_EXPORT_METHOD(openNetworkSettings:(NSDictionary *)params) {
+
+  [TuyaRNUtils openNetworkSettings];
+
+}
+
+RCT_EXPORT_METHOD(exitApp:(NSDictionary *)params) {
+
+}
+
+RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
+
+}
+
+RCT_EXPORT_METHOD(setLocation:(NSDictionary *)params) {
+  NSString *lat = params[kTuyaCoreModuleParamLat];
+  NSString *lon = params[kTuyaCoreModuleParamLon];
+  if ([lat isKindOfClass:[NSString class]] && lat.length > 0
+      && [lon isKindOfClass:[NSString class]] && lon.length > 0) {
+    [[ThingSmartSDK sharedInstance] setValue:lat forKey:@"latitude"];
+    [[ThingSmartSDK sharedInstance] setValue:lon forKey:@"longitude"];
+    [self.locationManager stopUpdatingLocation];
+  }
+}
+
+RCT_EXPORT_METHOD(getLocationData:(RCTPromiseResolveBlock)resolver
+                  reject:(RCTPromiseRejectBlock)rejecter) {
+  NSString *lat = [[NSUserDefaults standardUserDefaults] objectForKey:kTuyaCoreModuleUserDefaultLocation_lat];
+  NSString *lon = [[NSUserDefaults standardUserDefaults] objectForKey:kTuyaCoreModuleUserDefaultLocation_lon];
+
+  if (lat.length == 0) {
+    lat = @"";
+  }
+  if (lon.length == 0) {
+    lon = @"";
+  }
+
+  if (resolver) {
+    resolver(@{
+               kTuyaCoreModuleParamLat: [lat isKindOfClass:[NSString class]] ? lat : @"",
+               kTuyaCoreModuleParamLon: [lat isKindOfClass:[NSString class]] ? lon : @""
+               });
+  }
+}
+
 //通用api
 RCT_REMAP_METHOD(apiRequest,
                  postData:(NSDictionary *)parameters
-                 resolver:(RCTPromiseResolveBlock)resolver
-                 rejecter:(RCTPromiseRejectBlock)rejecter) {
-  
+                 resolve:(RCTPromiseResolveBlock)resolver
+                 reject:(RCTPromiseRejectBlock)rejecter) {
+
   NSString *apiName       = [parameters objectForKey:@"apiName"];
   NSDictionary *postData  = [parameters objectForKey:@"postData"];
   NSString *version       = [parameters objectForKey:@"version"];
-  
+
   ThingSmartRequest *request = [ThingSmartRequest new];
-  
+
   [request requestWithApiName:apiName postData:postData version:version success:^(id result) {
     if ([result isKindOfClass:[NSDictionary class]] || [result isKindOfClass:[NSArray class]]) {
       if (resolver) {
@@ -86,54 +131,17 @@ RCT_REMAP_METHOD(apiRequest,
   }];
 }
 
-//判断网络
-RCT_EXPORT_METHOD(openNetworkSettings:(NSDictionary *)params) {
-  
-  [TuyaRNUtils openNetworkSettings];
-  
+// initWithoutOptions/setOnNeedLoginListener only ever existed on Android
+// (they wire up ThingHomeSdk's INeedLoginListener, which has no iOS
+// equivalent in this module) - no-ops here so the shared TurboModule spec
+// compiles on both platforms.
+RCT_EXPORT_METHOD(initWithoutOptions) {
+
 }
 
-RCT_EXPORT_METHOD(exitApp:(NSDictionary *)params) {
-  
-}
+RCT_EXPORT_METHOD(setOnNeedLoginListener) {
 
-RCT_EXPORT_METHOD(onDestory:(NSDictionary *)params) {
-  
 }
-
-RCT_EXPORT_METHOD(setLocation:(NSDictionary *)params) {
-  NSString *lat = params[kTuyaCoreModuleParamLat];
-  NSString *lon = params[kTuyaCoreModuleParamLon];
-  if ([lat isKindOfClass:[NSString class]] && lat.length > 0
-      && [lon isKindOfClass:[NSString class]] && lon.length > 0) {
-    [[ThingSmartSDK sharedInstance] setValue:lat forKey:@"latitude"];
-    [[ThingSmartSDK sharedInstance] setValue:lon forKey:@"longitude"];
-    [self.locationManager stopUpdatingLocation];
-  }
-}
-
-RCT_EXPORT_METHOD(getLocationData:(RCTPromiseResolveBlock)resolver
-                  rejecter:(RCTPromiseRejectBlock)rejecter) {
-  //    BOOL gpsAvaliable = [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways;
-  //
-  NSString *lat = [[NSUserDefaults standardUserDefaults] objectForKey:kTuyaCoreModuleUserDefaultLocation_lat];
-  NSString *lon = [[NSUserDefaults standardUserDefaults] objectForKey:kTuyaCoreModuleUserDefaultLocation_lon];
-  
-  if (lat.length == 0) {
-    lat = @"";
-  }
-  if (lon.length == 0) {
-    lon = @"";
-  }
-  
-  if (resolver) {
-    resolver(@{
-               kTuyaCoreModuleParamLat: [lat isKindOfClass:[NSString class]] ? lat : @"",
-               kTuyaCoreModuleParamLon: [lat isKindOfClass:[NSString class]] ? lon : @""
-               });
-  }
-}
-
 
 #pragma mark - delegate
 #pragma mark - <CLLocationManagerDelegate>
@@ -144,12 +152,12 @@ RCT_EXPORT_METHOD(getLocationData:(RCTPromiseResolveBlock)resolver
     return;
   }
   CLLocation *location = locations[0];
-  
+
   [self.locationManager stopUpdatingLocation];
-  
+
   NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
   NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
-  
+
   [[NSUserDefaults standardUserDefaults] setObject:latitude forKey:kTuyaCoreModuleParamLat];
   [[NSUserDefaults standardUserDefaults] setObject:longitude forKey:kTuyaCoreModuleParamLon];
   [[NSUserDefaults standardUserDefaults] synchronize];
@@ -160,5 +168,14 @@ RCT_EXPORT_METHOD(getLocationData:(RCTPromiseResolveBlock)resolver
     [self.locationManager startUpdatingLocation];
   }
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeTuyaCoreModuleSpecJSI>(params);
+}
+
+#endif
 
 @end
