@@ -5,7 +5,7 @@ import com.facebook.react.module.annotations.ReactModule
 import com.tuya.smart.rnsdk.NativeTuyaRoomModuleSpec
 import com.thingclips.smart.home.sdk.ThingHomeSdk
 import com.thingclips.smart.home.sdk.api.IThingRoom
-import com.tuya.smart.rnsdk.utils.Constant.NAME
+import com.tuya.smart.rnsdk.utils.Constant
 import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.GROUPID
 import com.tuya.smart.rnsdk.utils.Constant.ROOMID
@@ -25,8 +25,8 @@ class TuyaRoomModule(reactContext: ReactApplicationContext) : NativeTuyaRoomModu
 
     /* 更新房间名称 */
     override fun updateRoom(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, NAME), params)) {
-            getRoomInstance(params.getDouble(ROOMID)).updateRoom(params.getString(NAME), getIResultCallback(promise))
+        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, Constant.NAME), params)) {
+            getRoomInstance(params.getDouble(ROOMID)).updateRoom(params.getString(Constant.NAME), getIResultCallback(promise))
         }
     }
 
