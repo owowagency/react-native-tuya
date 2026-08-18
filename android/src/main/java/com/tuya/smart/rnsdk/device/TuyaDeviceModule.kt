@@ -8,9 +8,9 @@ import com.thingclips.smart.sdk.api.IDevListener
 import com.thingclips.smart.sdk.api.IThingDevice
 import com.tuya.smart.rnsdk.NativeTuyaDeviceModuleSpec
 import com.tuya.smart.rnsdk.utils.BridgeUtils
+import com.tuya.smart.rnsdk.utils.Constant
 import com.tuya.smart.rnsdk.utils.Constant.COMMAND
 import com.tuya.smart.rnsdk.utils.Constant.DEVID
-import com.tuya.smart.rnsdk.utils.Constant.NAME
 import com.tuya.smart.rnsdk.utils.Constant.DATAPOINTTYPEENUM
 import com.tuya.smart.rnsdk.utils.Constant.NUMBER
 import com.tuya.smart.rnsdk.utils.Constant.DPID
@@ -121,8 +121,8 @@ class TuyaDeviceModule(reactContext: ReactApplicationContext) : NativeTuyaDevice
     }
 
     override fun renameDevice(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(DEVID, NAME), params)) {
-            getDevice(params.getString(DEVID) as String)?.renameDevice(params.getString(NAME), getIResultCallback(promise))
+        if (ReactParamsCheck.checkParams(arrayOf(DEVID, Constant.NAME), params)) {
+            getDevice(params.getString(DEVID) as String)?.renameDevice(params.getString(Constant.NAME), getIResultCallback(promise))
         }
     }
 

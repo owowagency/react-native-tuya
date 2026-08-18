@@ -20,7 +20,6 @@ import com.tuya.smart.rnsdk.utils.Constant.HOMEID
 import com.tuya.smart.rnsdk.utils.Constant.IDLIST
 import com.tuya.smart.rnsdk.utils.Constant.LAT
 import com.tuya.smart.rnsdk.utils.Constant.LON
-import com.tuya.smart.rnsdk.utils.Constant.NAME
 import com.tuya.smart.rnsdk.utils.Constant.PRODUCTID
 import com.tuya.smart.rnsdk.utils.Constant.ROOMID
 import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
@@ -52,8 +51,8 @@ class TuyaHomeModule(reactContext: ReactApplicationContext) : NativeTuyaHomeModu
 
     /* 更新家庭信息 */
     override fun updateHome(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, NAME, LON, LAT, GEONAME), params)) {
-            getHomeInstance(params.getDouble(HOMEID))?.updateHome(params.getString(NAME), params.getDouble(LON), params.getDouble(LAT), params.getString(GEONAME), getIResultCallback(promise))
+        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, Constant.NAME, LON, LAT, GEONAME), params)) {
+            getHomeInstance(params.getDouble(HOMEID))?.updateHome(params.getString(Constant.NAME), params.getDouble(LON), params.getDouble(LAT), params.getString(GEONAME), getIResultCallback(promise))
         }
     }
 
@@ -66,8 +65,8 @@ class TuyaHomeModule(reactContext: ReactApplicationContext) : NativeTuyaHomeModu
 
     /* 添加房间 */
     override fun addRoom(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, NAME), params)) {
-            getHomeInstance(params.getDouble(HOMEID))?.addRoom(params.getString(NAME), getITuyaRoomResultCallback(promise))
+        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, Constant.NAME), params)) {
+            getHomeInstance(params.getDouble(HOMEID))?.addRoom(params.getString(Constant.NAME), getITuyaRoomResultCallback(promise))
         }
     }
 
@@ -110,7 +109,7 @@ class TuyaHomeModule(reactContext: ReactApplicationContext) : NativeTuyaHomeModu
 
     /* 创建群组 */
     override fun createGroup(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, PRODUCTID, NAME, DEVIDLIST), params)) {
+        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, PRODUCTID, Constant.NAME, DEVIDLIST), params)) {
             var list = ArrayList<String>()
             var length = (params.getArray(DEVIDLIST) as ReadableArray).size()
             for (index in 0..length) {
@@ -118,7 +117,7 @@ class TuyaHomeModule(reactContext: ReactApplicationContext) : NativeTuyaHomeModu
             }
             getHomeInstance(params.getDouble(HOMEID))?.createGroup(
                     params.getString(PRODUCTID),
-                    params.getString(NAME),
+                    params.getString(Constant.NAME),
                     list,
                     object : IThingResultCallback<Long> {
                         override fun onSuccess(var1: Long) {
