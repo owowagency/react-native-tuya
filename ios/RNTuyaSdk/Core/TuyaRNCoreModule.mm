@@ -63,7 +63,7 @@ RCT_EXPORT_METHOD(openNetworkSettings:(NSDictionary *)params) {
 
 }
 
-RCT_EXPORT_METHOD(exitApp:(NSDictionary *)params) {
+RCT_EXPORT_METHOD(exitApp) {
 
 }
 
@@ -104,7 +104,7 @@ RCT_EXPORT_METHOD(getLocationData:(RCTPromiseResolveBlock)resolver
 
 //通用api
 RCT_REMAP_METHOD(apiRequest,
-                 postData:(NSDictionary *)parameters
+                 apiRequest:(NSDictionary *)parameters
                  resolve:(RCTPromiseResolveBlock)resolver
                  reject:(RCTPromiseRejectBlock)rejecter) {
 
