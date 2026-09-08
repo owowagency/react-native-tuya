@@ -38,6 +38,10 @@
 
 + (void)registerGroup:(ThingSmartGroup *)group {
 
+  if (!group) {
+    return;
+  }
+
   __block BOOL exist = NO;
   [[TuyaRNGroupListener shareInstance].listenGroupArr enumerateObjectsUsingBlock:^(ThingSmartGroup * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
     if ([obj.groupModel.groupId isEqualToString:group.groupModel.groupId]) {

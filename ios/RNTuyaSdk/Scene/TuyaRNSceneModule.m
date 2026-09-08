@@ -137,6 +137,9 @@ RCT_EXPORT_METHOD(createAutoScene:(NSDictionary *)params resolver:(RCTPromiseRes
     // 天气：
     if([item[@"entityType"] integerValue] == 3) {
       //气象条件
+      if (!item[@"range"] || !item[@"rule"]) {
+        continue;
+      }
       actionModel.entityId = item[@"cityId"];
       actionModel.entityName = item[@"cityName"];
       actionModel.entitySubIds = item[@"entitySubId"];
@@ -146,10 +149,13 @@ RCT_EXPORT_METHOD(createAutoScene:(NSDictionary *)params resolver:(RCTPromiseRes
       actionModel.expr = @[@"$temp",item[@"range"], item[@"rule"]];
       [conditionList addObject:actionModel];
     }
-    
+
     // 定时器：
     else if([item[@"entityType"] integerValue] == 6) {
       //定时条件
+      if (!item[@"delayTime"]) {
+        continue;
+      }
       actionModel.expr = @[item];
       actionModel.extraInfo = @{@"delayTime" : item[@"delayTime"]};
       [conditionList addObject:actionModel];
@@ -158,27 +164,33 @@ RCT_EXPORT_METHOD(createAutoScene:(NSDictionary *)params resolver:(RCTPromiseRes
     // 设备：
     else if([item[@"entityType"] integerValue] == 1) {
       //设备条件
+      if (!item[@"rule"]) {
+        continue;
+      }
       actionModel.entityId = item[@"devId"];
       ThingSmartDevice *device = [ThingSmartDevice deviceWithDeviceId:item[@"devId"]];
       actionModel.entityName = device.deviceModel.name;;
       actionModel.entitySubIds = [NSString stringWithFormat:@"%@", item[@"dpId"]];
-      
+
       actionModel.expr = @[@[[NSString stringWithFormat:@"dp%@", item[@"dpId"]],@"==",item[@"rule"]]];
       [conditionList addObject:actionModel];
     }
-    
+
   }
 
   NSMutableArray *actionList = [NSMutableArray array];
   for(NSDictionary *item in params[@"tasks"]) {
+    if (!item[@"value"]) {
+      continue;
+    }
     ThingSmartSceneActionModel *actionModel = [[ThingSmartSceneActionModel alloc] init];
     actionModel.entityId = item[@"devId"];
     actionModel.executorProperty = @{[NSString stringWithFormat:@"%@", item[@"dpId"]]: item[@"value"], };
     actionModel.actionExecutor = @"dpIssue";
     [actionList addObject:actionModel];
   }
-  
-  
+
+
   [ThingSmartScene addNewSceneWithName:params[@"name"] homeId:[params[@"homeId"] longLongValue] background:params[@"background"] showFirstPage:params[@"stickyOnTop"] preConditionList:params[@"preConditionList"] conditionList:conditionList actionList:actionList matchType:[params[@"matchType"] integerValue] success:^(ThingSmartSceneModel *sceneModel) {
     if (resolver) {
       resolver([sceneModel yy_modelToJSONObject]);
@@ -252,16 +264,19 @@ RCT_EXPORT_METHOD(createScene:(NSDictionary *)params resolver:(RCTPromiseResolve
   
   NSMutableArray *actionList = [NSMutableArray array];
   for(NSDictionary *item in params[@"tasks"]) {
+    if (!item[@"value"]) {
+      continue;
+    }
     ThingSmartSceneActionModel *actionModel = [[ThingSmartSceneActionModel alloc] init];
     actionModel.entityId = item[@"devId"];
     actionModel.executorProperty = @{[NSString stringWithFormat:@"%@", item[@"dpId"]]: item[@"value"], };
-    
+
     actionModel.actionExecutor = @"dpIssue";
-    
-    
+
+
     [actionList addObject:actionModel];
   }
-  
+
   [ThingSmartScene addNewSceneWithName:params[@"name"] homeId:[params[@"homeId"] longLongValue] background:params[@"background"] showFirstPage:params[@"stickyOnTop"] preConditionList:params[@"preConditionList"] conditionList:params[@"conditionList"] actionList:actionList matchType:[params[@"matchType"] integerValue] success:^(ThingSmartSceneModel *sceneModel) {
     if (resolver) {
       resolver([sceneModel yy_modelToJSONObject]);
@@ -273,21 +288,24 @@ RCT_EXPORT_METHOD(createScene:(NSDictionary *)params resolver:(RCTPromiseResolve
 
 // 修改场景：
 RCT_EXPORT_METHOD(modifyScene:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  
+
   NSMutableArray *actionList = [NSMutableArray array];
   for(NSDictionary *item in params[@"tasks"]) {
+    if (!item[@"value"]) {
+      continue;
+    }
     ThingSmartSceneActionModel *actionModel = [[ThingSmartSceneActionModel alloc] init];
     actionModel.entityId = item[@"devId"];
     actionModel.executorProperty = @{[NSString stringWithFormat:@"%@", item[@"dpId"]]: item[@"value"], };
     actionModel.actionExecutor = @"dpIssue";
     [actionList addObject:actionModel];
   }
-  
+
   ThingSmartSceneModel *model = [ThingSmartSceneModel new];
   model.sceneId = params[@"sceneId"];
   model.actions = actionList;
   model.name = params[@"name"];
-  
+
   ThingSmartScene *smartScene = [ThingSmartScene sceneWithSceneModel:model];
   self.smartScene = smartScene;
   [smartScene modifySceneWithName:params[@"name"] background:params[@"background"] showFirstPage:params[@"stickyOnTop"] preConditionList:@[] conditionList:@[] actionList:actionList matchType:[params[@"matchType"] integerValue] success:^{
@@ -306,25 +324,31 @@ RCT_EXPORT_METHOD(modifyAutoScene:(NSDictionary *)params resolver:(RCTPromiseRes
   
   NSMutableArray *actionList = [NSMutableArray array];
   for(NSDictionary *item in params[@"tasks"]) {
+    if (!item[@"value"]) {
+      continue;
+    }
     ThingSmartSceneActionModel *actionModel = [[ThingSmartSceneActionModel alloc] init];
     actionModel.entityId = item[@"devId"];
     actionModel.executorProperty = @{[NSString stringWithFormat:@"%@", item[@"dpId"]]: item[@"value"], };
     actionModel.actionExecutor = @"dpIssue";
     [actionList addObject:actionModel];
   }
-  
+
   ThingSmartSceneModel *model = [ThingSmartSceneModel new];
   model.sceneId = params[@"sceneId"];
   model.actions = actionList;
   model.name = params[@"name"];
-  
-  
+
+
   NSMutableArray *conditionList = [NSMutableArray array];
   for(NSDictionary *item in params[@"conditionList"]) {
     ThingSmartSceneConditionModel *actionModel = [[ThingSmartSceneConditionModel alloc] init];
     // 天气：
     if([item[@"entityType"] integerValue] == 3) {
       //气象条件
+      if (!item[@"range"] || !item[@"rule"]) {
+        continue;
+      }
       actionModel.entityId = item[@"cityId"];
       actionModel.entityName = item[@"cityName"];
       actionModel.entitySubIds = item[@"entitySubId"];
@@ -337,6 +361,9 @@ RCT_EXPORT_METHOD(modifyAutoScene:(NSDictionary *)params resolver:(RCTPromiseRes
     // 定时器：
     else if([item[@"entityType"] integerValue] == 6) {
       //定时条件
+      if (!item[@"delayTime"]) {
+        continue;
+      }
       actionModel.expr = @[item];
       actionModel.extraInfo = @{@"delayTime" : item[@"delayTime"]};
       [conditionList addObject:actionModel];
@@ -344,11 +371,14 @@ RCT_EXPORT_METHOD(modifyAutoScene:(NSDictionary *)params resolver:(RCTPromiseRes
     // 设备：
     else if([item[@"entityType"] integerValue] == 1) {
       //设备条件
+      if (!item[@"rule"]) {
+        continue;
+      }
       actionModel.entityId = item[@"devId"];
       ThingSmartDevice *device = [ThingSmartDevice deviceWithDeviceId:item[@"devId"]];
       actionModel.entityName = device.deviceModel.name;;
       actionModel.entitySubIds = [NSString stringWithFormat:@"%@", item[@"dpId"]];
-      
+
       actionModel.expr = @[@[[NSString stringWithFormat:@"dp%@", item[@"dpId"]],@"==",item[@"rule"]]];
       [conditionList addObject:actionModel];
     }

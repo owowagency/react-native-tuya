@@ -44,6 +44,10 @@ static inline BOOL TuyaRNDeviceListenTypeAvailable(TuyaRNDeviceListenType type) 
 
 + (void)registerDevice:(ThingSmartDevice *)device type:(TuyaRNDeviceListenType)type {
 
+  if (!device) {
+    return;
+  }
+
   if (!TuyaRNDeviceListenTypeAvailable(type)) {
     return;
   }
